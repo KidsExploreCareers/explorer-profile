@@ -13,7 +13,6 @@ const EXPLORER_PROFILE_DATA = {
 
   // ------------------------------------------------------------
   // ANSWER CHOICES
-  // Exact response choices and weights from the existing workbook.
   // ------------------------------------------------------------
 
   answerChoices: [
@@ -42,16 +41,12 @@ const EXPLORER_PROFILE_DATA = {
 
   // ------------------------------------------------------------
   // SCORING CONFIGURATION
-  //
-  // These values preserve the structure used by the existing
-  // Google Sheets scoring system.
   // ------------------------------------------------------------
 
   scoring: {
     questionsPerSignal: 5,
 
-    // Although responses range from 0–4, the existing spreadsheet
-    // divides raw scores by count × 5.
+    // Preserve the existing Google Sheets scoring method.
     scaleDivisor: 5,
 
     completenessBase: 0.7,
@@ -61,9 +56,6 @@ const EXPLORER_PROFILE_DATA = {
 
   // ------------------------------------------------------------
   // EXPLORER SIGNALS
-  //
-  // "family" reflects the groupings used in the current
-  // Explorer Map / radar chart.
   // ------------------------------------------------------------
 
   signals: [
@@ -112,16 +104,63 @@ const EXPLORER_PROFILE_DATA = {
 
   // ------------------------------------------------------------
   // PROFILE NAME
-  //
-  // Optional. This value will remain in the browser only.
+  // Optional and kept only in browser memory.
   // ------------------------------------------------------------
 
   namePrompt: {
-    label: "What should we call you?",
+    label: "What should we call you in your Explorer Profile?",
     helpText:
-      "You can skip this if you want. It simply helps us say hello in your Explorer Profile.",
+      "You can use your first name, nickname, or leave this blank. Please don't enter your last name.",
     required: false
   },
+
+
+  // ------------------------------------------------------------
+  // QUESTIONNAIRE SECTIONS
+  // ------------------------------------------------------------
+
+  sections: [
+    {
+      id: "enjoy-and-wonder",
+      title: "What I Enjoy and Wonder About",
+      description:
+        "These questions are about what you enjoy, what interests you, and what naturally grabs your attention.",
+      startQuestion: 1,
+      endQuestion: 10
+    },
+    {
+      id: "how-i-think",
+      title: "How I Like to Think",
+      description:
+        "These questions are about how you think about ideas, choices, and experiences.",
+      startQuestion: 11,
+      endQuestion: 15
+    },
+    {
+      id: "start-and-keep-going",
+      title: "How I Start and Keep Going",
+      description:
+        "These questions are about how you begin things, stick with them, and grow while working on something over time.",
+      startQuestion: 16,
+      endQuestion: 25
+    },
+    {
+      id: "solve-problems-and-help",
+      title: "How I Solve Problems and Help",
+      description:
+        "These questions are about how you approach problems, help others, and work on things that matter.",
+      startQuestion: 26,
+      endQuestion: 35
+    },
+    {
+      id: "others-and-organization",
+      title: "How I Work With Others and Stay Organized",
+      description:
+        "These questions are about how you like to work with people, follow routines, and keep things organized.",
+      startQuestion: 36,
+      endQuestion: 50
+    }
+  ],
 
 
   // ------------------------------------------------------------
@@ -498,10 +537,6 @@ const EXPLORER_PROFILE_DATA = {
 
   // ------------------------------------------------------------
   // OPTIONAL REFLECTION QUESTIONS
-  //
-  // These replace the two open-ended fields from the Google Form.
-  // They will remain local in the browser and can appear in
-  // "In Your Own Words" on the final Explorer Profile.
   // ------------------------------------------------------------
 
   reflectionQuestions: [
