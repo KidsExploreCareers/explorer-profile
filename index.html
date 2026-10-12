@@ -2,7 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Create a private Explorer Profile and discover interests, strengths, and ways of learning."
+  >
 
   <title>Explorer Profile | Kids Explore Careers</title>
 
@@ -10,45 +19,50 @@
 </head>
 
 <body>
+
   <main class="app-shell">
 
-    <section class="hero">
-      <h1>Kids Explore Careers</h1>
-      <h2>Explorer Profile</h2>
-    </section>
+    <header class="hero">
 
-    <section id="app-card" class="card">
-      <h2>Discover what stands out about you</h2>
+      <h1 class="brand-name" aria-label="Kids Explore Careers">
+        <span class="brand-kids">Kids</span>
+        <span class="brand-explore">Explore</span>
+        <span class="brand-careers">Careers</span>
+      </h1>
 
-      <p>
-        Answer a series of questions about what you enjoy, how you think,
-        how you solve problems, and how you work with others.
+      <p class="hero-subtitle">
+        Explorer Profile
       </p>
 
+    </header>
+
+    <section
+      id="app-card"
+      class="card"
+      aria-live="polite"
+    ></section>
+
+    <footer class="app-footer">
       <p>
-        At the end, you'll receive your own Explorer Profile — a snapshot
-        of your interests, strengths, and ways of learning.
+        Kids Explore Careers
       </p>
-
-      <div class="privacy-note">
-        <strong>Your answers stay private.</strong><br>
-        Your questionnaire answers are processed in your browser and are
-        not submitted to or stored by Kids Explore Careers.
-      </div>
-
-      <button id="start-button" class="primary-button" type="button">
-      Create My Explorer Profile
-      </button>
 
       <p class="small-text">
-        You can stop at any time. Your answers are not saved after you leave
-        or refresh this page.
+        Your Explorer Profile answers stay in this browser tab and are
+        not submitted to Kids Explore Careers.
       </p>
-    </section>
+    </footer>
 
   </main>
-  
+
+  <noscript>
+    <div class="noscript-message">
+      JavaScript is required to use the Explorer Profile.
+    </div>
+  </noscript>
+
   <script src="questions.js"></script>
   <script src="app.js"></script>
+
 </body>
 </html>
