@@ -34,13 +34,17 @@
       .replaceAll("'", "&#039;");
   }
 
-  function getSectionForQuestion(questionNumber) {
-    return data.sections.find(
-      (section) =>
-        questionNumber >= section.startQuestion &&
-        questionNumber <= section.endQuestion
-    );
+function getSectionForQuestion(questionNumber) {
+  if (!Array.isArray(data.sections)) {
+    return null;
   }
+
+  return data.sections.find(
+    (section) =>
+      questionNumber >= section.startQuestion &&
+      questionNumber <= section.endQuestion
+  );
+}
 
   function renderWelcome() {
     appCard.innerHTML = `
