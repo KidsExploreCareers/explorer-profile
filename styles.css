@@ -1,0 +1,87 @@
+:root {
+  --yellow: #ffca28;
+  --orange: #f7941d;
+  --blue: #0077b6;
+  --green: #55a64a;
+  --ink: #17212b;
+  --muted: #667085;
+  --paper: #ffffff;
+  --soft: #fff7d6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  background: var(--soft);
+}
+
+.app-shell {
+  width: min(760px, calc(100% - 32px));
+  margin: 32px auto;
+}
+
+.hero {
+  background: var(--yellow);
+  border-radius: 24px;
+  padding: 36px 28px;
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 6vw, 3.4rem);
+  color: var(--blue);
+}
+
+.hero h2 {
+  margin: 8px 0 0;
+  font-size: clamp(1.5rem, 4vw, 2.3rem);
+  color: var(--green);
+}
+
+.card {
+  margin-top: 24px;
+  background: var(--paper);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.privacy-note {
+  background: #eef8ef;
+  border-left: 5px solid var(--green);
+  padding: 16px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+
+button {
+  font: inherit;
+}
+
+.primary-button {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 14px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--blue);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  filter: brightness(0.92);
+}
+
+.small-text {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
