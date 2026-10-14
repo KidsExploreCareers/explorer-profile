@@ -11,6 +11,10 @@
 
 const EXPLORER_PROFILE_DATA = {
 
+  // ------------------------------------------------------------
+  // ANSWER CHOICES
+  // ------------------------------------------------------------
+
   answerChoices: [
     {
       label: "❌ No, not me",
@@ -35,17 +39,24 @@ const EXPLORER_PROFILE_DATA = {
   ],
 
 
-  /*
-   * Preserve the current Explorer Profile scoring method.
-   * We will use this when the local scoring engine is added.
-   */
+  // ------------------------------------------------------------
+  // SCORING CONFIGURATION
+  // ------------------------------------------------------------
+
   scoring: {
     questionsPerSignal: 5,
+
+    // Preserve the existing Google Sheets scoring method.
     scaleDivisor: 5,
+
     completenessBase: 0.7,
     completenessBonus: 0.3
   },
 
+
+  // ------------------------------------------------------------
+  // EXPLORER SIGNALS
+  // ------------------------------------------------------------
 
   signals: [
     {
@@ -91,6 +102,11 @@ const EXPLORER_PROFILE_DATA = {
   ],
 
 
+  // ------------------------------------------------------------
+  // PROFILE NAME
+  // Optional and kept only in browser memory.
+  // ------------------------------------------------------------
+
   namePrompt: {
     label: "What should we call you in your Explorer Profile?",
     helpText:
@@ -98,6 +114,10 @@ const EXPLORER_PROFILE_DATA = {
     required: false
   },
 
+
+  // ------------------------------------------------------------
+  // QUESTIONNAIRE SECTIONS
+  // ------------------------------------------------------------
 
   sections: [
     {
@@ -143,7 +163,15 @@ const EXPLORER_PROFILE_DATA = {
   ],
 
 
+  // ------------------------------------------------------------
+  // 50 SELF-DISCOVERY QUESTIONS
+  // ------------------------------------------------------------
+
   questions: [
+
+    // ==========================================================
+    // CURIOSITY
+    // ==========================================================
 
     {
       id: "Q1",
@@ -175,6 +203,11 @@ const EXPLORER_PROFILE_DATA = {
       signal: "Curiosity",
       text: "I like learning how the world works."
     },
+
+
+    // ==========================================================
+    // CREATIVITY
+    // ==========================================================
 
     {
       id: "Q6",
@@ -208,6 +241,11 @@ const EXPLORER_PROFILE_DATA = {
       text: "I enjoy coming up with new ideas or new ways to do things."
     },
 
+
+    // ==========================================================
+    // REFLECTION
+    // ==========================================================
+
     {
       id: "Q11",
       number: 11,
@@ -238,6 +276,11 @@ const EXPLORER_PROFILE_DATA = {
       signal: "Reflection",
       text: "I like thinking about what I could do differently next time."
     },
+
+
+    // ==========================================================
+    // INITIATIVE
+    // ==========================================================
 
     {
       id: "Q16",
@@ -270,6 +313,11 @@ const EXPLORER_PROFILE_DATA = {
       text: "I like taking the first step when there’s something to do."
     },
 
+
+    // ==========================================================
+    // PERSISTENCE
+    // ==========================================================
+
     {
       id: "Q21",
       number: 21,
@@ -300,6 +348,11 @@ const EXPLORER_PROFILE_DATA = {
       signal: "Persistence",
       text: "I enjoy finishing what I start."
     },
+
+
+    // ==========================================================
+    // REASONING
+    // ==========================================================
 
     {
       id: "Q26",
@@ -333,6 +386,11 @@ const EXPLORER_PROFILE_DATA = {
       text: "I like making something better after it already exists."
     },
 
+
+    // ==========================================================
+    // INSTRUCTION
+    // ==========================================================
+
     {
       id: "Q31",
       number: 31,
@@ -365,6 +423,11 @@ const EXPLORER_PROFILE_DATA = {
       text: "I like being the person others ask for help."
     },
 
+
+    // ==========================================================
+    // EMPATHY
+    // ==========================================================
+
     {
       id: "Q36",
       number: 36,
@@ -396,6 +459,11 @@ const EXPLORER_PROFILE_DATA = {
       text: "Helping others feels important to who I am."
     },
 
+
+    // ==========================================================
+    // COLLABORATION
+    // ==========================================================
+
     {
       id: "Q41",
       number: 41,
@@ -426,6 +494,11 @@ const EXPLORER_PROFILE_DATA = {
       signal: "Collaboration",
       text: "I like being part of a team."
     },
+
+
+    // ==========================================================
+    // ORGANIZATION
+    // ==========================================================
 
     {
       id: "Q46",
@@ -461,6 +534,10 @@ const EXPLORER_PROFILE_DATA = {
     }
   ],
 
+
+  // ------------------------------------------------------------
+  // OPTIONAL REFLECTION QUESTIONS
+  // ------------------------------------------------------------
 
   reflectionQuestions: [
     {
