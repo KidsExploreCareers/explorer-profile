@@ -6,7 +6,7 @@
   --blue: #057c96;
   --green: #45a53f;
 
-  /* Explorer Map colors from the original profile */
+  /* Explorer Map colors */
   --thinking: #0077b6;
   --action: #f7941d;
   --helping: #4caf50;
@@ -57,6 +57,10 @@ textarea {
   margin: 32px auto 48px;
 }
 
+/* ==========================================================
+   BRAND HEADER
+========================================================== */
+
 .hero {
   padding: 32px 24px 28px;
   text-align: center;
@@ -102,6 +106,10 @@ textarea {
   line-height: 1.15;
 }
 
+/* ==========================================================
+   MAIN CARD
+========================================================== */
+
 .card {
   margin-top: 16px;
   padding: 30px;
@@ -125,6 +133,10 @@ textarea {
   line-height: 1.55;
 }
 
+/* ==========================================================
+   PRIVACY
+========================================================== */
+
 .privacy-note {
   margin: 20px 0;
   padding: 16px 18px;
@@ -138,40 +150,47 @@ textarea {
   color: #2e7332;
 }
 
-.primary-button {
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.primary-button,
+.secondary-button {
   display: inline-block;
   margin-top: 18px;
   padding: 13px 22px;
-  border: 0;
   border-radius: 10px;
-  background: var(--blue);
-  color: #ffffff;
   font-weight: 900;
   cursor: pointer;
+}
+
+.primary-button {
+  border: 0;
+  background: var(--blue);
+  color: #ffffff;
   transition:
     transform 0.12s ease,
     filter 0.12s ease;
 }
 
-.primary-button:hover {
+.primary-button:hover:not(:disabled) {
   filter: brightness(0.93);
   transform: translateY(-1px);
 }
 
-.primary-button:active {
+.primary-button:active:not(:disabled) {
   transform: translateY(0);
 }
 
+.primary-button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
 .secondary-button {
-  display: inline-block;
-  margin-top: 18px;
-  padding: 12px 21px;
   border: 2px solid var(--blue);
-  border-radius: 10px;
   background: #ffffff;
   color: var(--blue);
-  font-weight: 900;
-  cursor: pointer;
   transition:
     background 0.12s ease,
     transform 0.12s ease;
@@ -180,6 +199,15 @@ textarea {
 .secondary-button:hover {
   background: #eef8fa;
   transform: translateY(-1px);
+}
+
+.print-button {
+  border-color: var(--green);
+  color: #2f7633;
+}
+
+.print-button:hover {
+  background: var(--soft-green);
 }
 
 .text-button {
@@ -202,6 +230,10 @@ textarea {
   line-height: 1.5;
 }
 
+/* ==========================================================
+   PROGRESS
+========================================================== */
+
 .progress-label {
   margin-bottom: 10px;
   color: var(--blue);
@@ -212,7 +244,7 @@ textarea {
 .progress-track {
   width: 100%;
   height: 10px;
-  margin-bottom: 22px;
+  margin-bottom: 25px;
   overflow: hidden;
   background: #e8edf2;
   border-radius: 999px;
@@ -225,32 +257,16 @@ textarea {
   transition: width 0.2s ease;
 }
 
-.section-heading {
-  margin: 18px 0 24px;
-  padding: 17px 18px;
-  background: var(--yellow);
-  border-radius: 9px;
-}
-
-.section-heading h3 {
-  margin: 0 0 7px;
-  color: var(--ink);
-  font-size: 1.08rem;
-  font-weight: 900;
-}
-
-.section-heading p {
-  margin: 0;
-  color: #292929;
-  line-height: 1.45;
-}
+/* ==========================================================
+   QUESTIONS
+========================================================== */
 
 .question-text {
-  margin-top: 8px;
+  margin-top: 15px;
   margin-bottom: 8px;
-  font-size: clamp(1.22rem, 3vw, 1.55rem);
+  font-size: clamp(1.32rem, 3vw, 1.65rem);
   font-weight: 800;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .answer-list {
@@ -304,6 +320,10 @@ textarea {
   margin-top: 22px;
 }
 
+/* ==========================================================
+   INPUTS
+========================================================== */
+
 .field-label {
   display: block;
   margin-top: 22px;
@@ -335,6 +355,10 @@ textarea {
   margin-top: 26px;
 }
 
+/* ==========================================================
+   RESULTS — PAGE 1
+========================================================== */
+
 .completion-mark {
   width: 64px;
   height: 64px;
@@ -347,10 +371,6 @@ textarea {
   font-size: 2rem;
   font-weight: 900;
 }
-
-/* ==========================================================
-   RESULTS PROFILE
-========================================================== */
 
 .profile-results-header {
   margin-bottom: 26px;
@@ -369,9 +389,15 @@ textarea {
   font-weight: 700;
 }
 
+.print-brand {
+  display: none;
+}
+
 .profile-top-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
   gap: 28px;
   align-items: start;
 }
@@ -415,6 +441,21 @@ textarea {
 .balanced-callout p {
   margin: 6px 0 0;
 }
+
+.next-step-section {
+  padding: 17px 18px;
+  background: #fff9df;
+  border-left: 6px solid var(--orange);
+  border-radius: 10px;
+}
+
+.next-step-section h3 {
+  margin-bottom: 7px;
+}
+
+/* ==========================================================
+   RADAR
+========================================================== */
 
 .radar-section {
   text-align: center;
@@ -512,6 +553,14 @@ textarea {
   stroke-linecap: round;
 }
 
+.radar-note {
+  margin: 8px auto 0 !important;
+  max-width: 420px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4 !important;
+}
+
 .own-words-section blockquote {
   margin: 0;
   padding: 0;
@@ -519,60 +568,6 @@ textarea {
   font-style: italic;
   font-size: 1.02rem;
   line-height: 1.55;
-}
-
-.score-details {
-  margin-top: 30px;
-  padding: 16px 18px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fbfcfd;
-}
-
-.score-details summary {
-  color: var(--blue);
-  font-weight: 900;
-  cursor: pointer;
-}
-
-.score-explainer {
-  margin-bottom: 18px;
-}
-
-.score-list {
-  display: grid;
-  gap: 14px;
-}
-
-.score-row-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 5px;
-  font-size: 0.95rem;
-}
-
-.score-row-heading span {
-  font-weight: 800;
-}
-
-.score-meter {
-  height: 8px;
-  overflow: hidden;
-  background: #e8edf2;
-  border-radius: 999px;
-}
-
-.score-meter-fill {
-  height: 100%;
-  background: var(--blue);
-  border-radius: inherit;
-}
-
-.score-answer-count {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 0.78rem;
 }
 
 .profile-fluidity-note {
@@ -591,6 +586,218 @@ textarea {
   margin-top: 24px;
 }
 
+/* ==========================================================
+   SCORE DETAILS — PAGE 2 CONTENT
+========================================================== */
+
+.score-details {
+  margin-top: 30px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fbfcfd;
+}
+
+.score-details summary {
+  color: var(--blue);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.score-page-header {
+  margin-top: 20px;
+}
+
+.print-score-title {
+  margin: 0 0 12px;
+  font-size: 1.45rem;
+  font-weight: 900;
+}
+
+.signals-not-grades {
+  margin: 14px 0;
+  padding: 13px 15px;
+  background: #fff9df;
+  border-left: 5px solid var(--orange);
+  border-radius: 9px;
+}
+
+.signals-not-grades strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.signals-not-grades p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.score-explainer {
+  margin-bottom: 18px;
+}
+
+.score-family-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 16px;
+}
+
+.score-family-panel {
+  padding: 15px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  border-top-width: 5px;
+}
+
+.score-family-panel h4 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.score-family-thinking {
+  border-top-color: var(--thinking);
+}
+
+.score-family-action {
+  border-top-color: var(--action);
+}
+
+.score-family-helping {
+  border-top-color: var(--helping);
+}
+
+.score-family-organization {
+  border-top-color: var(--organization);
+}
+
+.score-family-rows {
+  display: grid;
+  gap: 14px;
+}
+
+.score-row-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 5px;
+  font-size: 0.92rem;
+}
+
+.score-name {
+  font-weight: 800;
+}
+
+.score-meter {
+  height: 8px;
+  overflow: hidden;
+  background: #e8edf2;
+  border-radius: 999px;
+}
+
+.score-meter-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.score-fill-thinking {
+  background: var(--thinking);
+}
+
+.score-fill-action {
+  background: var(--action);
+}
+
+.score-fill-helping {
+  background: var(--helping);
+}
+
+.score-fill-organization {
+  background: #aeb4ba;
+}
+
+.score-answer-count {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.score-answer-count.incomplete {
+  color: #9b5b12;
+  font-weight: 800;
+}
+
+/* ==========================================================
+   METHODOLOGY
+========================================================== */
+
+.methodology-section {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 2px solid var(--line);
+}
+
+.methodology-section h3 {
+  margin: 0 0 10px;
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+.methodology-intro {
+  margin: 0 0 10px !important;
+  color: #30343a;
+  font-size: 0.91rem;
+  line-height: 1.48 !important;
+}
+
+.methodology-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.methodology-lens {
+  padding: 13px 14px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+}
+
+.methodology-lens h4 {
+  margin: 0 0 5px;
+  color: var(--blue);
+  font-size: 0.96rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.methodology-lens p {
+  margin: 0;
+  font-size: 0.83rem;
+  line-height: 1.42;
+}
+
+.methodology-map {
+  margin-top: 7px !important;
+  color: var(--muted);
+  font-size: 0.75rem !important;
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
 .app-footer {
   margin-top: 24px;
   padding: 12px 16px 0;
@@ -602,7 +809,10 @@ textarea {
 }
 
 .noscript-message {
-  width: min(760px, calc(100% - 32px));
+  width: min(
+    760px,
+    calc(100% - 32px)
+  );
   margin: 24px auto;
   padding: 18px;
   background: #ffffff;
@@ -613,6 +823,10 @@ textarea {
   text-align: center;
 }
 
+/* ==========================================================
+   ACCESSIBILITY
+========================================================== */
+
 button:focus-visible,
 .text-input:focus-visible,
 .text-area:focus-visible {
@@ -620,13 +834,21 @@ button:focus-visible,
   outline-offset: 3px;
 }
 
-.answer-option:has(input:focus-visible) {
+.answer-option:has(
+  input:focus-visible
+) {
   outline: 4px solid rgba(5, 124, 150, 0.25);
   outline-offset: 3px;
 }
 
+/* ==========================================================
+   MOBILE
+========================================================== */
+
 @media (max-width: 680px) {
-  .profile-top-grid {
+  .profile-top-grid,
+  .score-family-grid,
+  .methodology-grid {
     grid-template-columns: 1fr;
   }
 
@@ -641,7 +863,10 @@ button:focus-visible,
 
 @media (max-width: 600px) {
   .app-shell {
-    width: min(100% - 18px, 760px);
+    width: min(
+      100% - 18px,
+      760px
+    );
     margin: 10px auto 26px;
   }
 
@@ -651,7 +876,11 @@ button:focus-visible,
   }
 
   .brand-name {
-    font-size: clamp(2.2rem, 11vw, 3.2rem);
+    font-size: clamp(
+      2.2rem,
+      11vw,
+      3.2rem
+    );
   }
 
   .hero-subtitle {
@@ -662,10 +891,6 @@ button:focus-visible,
     margin-top: 10px;
     padding: 20px 18px;
     border-radius: 11px;
-  }
-
-  .section-heading {
-    margin-top: 14px;
   }
 
   .answer-option {
@@ -695,5 +920,331 @@ button:focus-visible,
 
   .radar-label {
     font-size: 14px;
+  }
+
+  .score-details {
+    padding: 15px;
+  }
+}
+
+/* ==========================================================
+   PRINT / SAVE AS PDF
+   PAGE 1 = PROFILE
+   PAGE 2 = SIGNAL SCORES + METHODOLOGY
+========================================================== */
+
+@page {
+  size: Letter portrait;
+  margin: 0.35in;
+}
+
+@media print {
+  html,
+  body {
+    width: 100%;
+    min-height: 0;
+    background: #ffffff;
+  }
+
+  body {
+    font-size: 9pt;
+    color: #000000;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .hero,
+  .app-footer,
+  .results-privacy-note,
+  .results-button-row,
+  .noscript-message {
+    display: none !important;
+  }
+
+  .app-shell {
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+
+  .card {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .print-brand {
+    display: block;
+    margin: 0 0 3pt !important;
+    color: var(--blue);
+    font-size: 7.8pt;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ========================================================
+     PRINT PAGE 1
+  ======================================================== */
+
+  .profile-results-header {
+    margin: 0 0 8pt;
+    text-align: left;
+  }
+
+  .profile-results-header h2 {
+    margin: 0 0 2pt;
+    font-size: 18pt;
+    line-height: 1.05;
+  }
+
+  .profile-date {
+    font-size: 7.5pt;
+  }
+
+  .profile-top-grid {
+    grid-template-columns:
+      0.92fr
+      1.08fr;
+    gap: 12pt;
+    align-items: start;
+  }
+
+  .profile-section {
+    margin-top: 7pt;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .profile-top-grid
+  .profile-section {
+    margin-top: 0;
+  }
+
+  .profile-section h3 {
+    margin: 0 0 3pt;
+    font-size: 10.8pt;
+    line-height: 1.1;
+  }
+
+  .profile-section p,
+  .standout-list li,
+  .own-words-section blockquote {
+    font-size: 8.2pt;
+    line-height: 1.29;
+  }
+
+  .standout-list {
+    padding-left: 12pt;
+  }
+
+  .standout-list li {
+    margin-bottom: 3pt;
+  }
+
+  .balanced-callout {
+    padding: 7pt;
+  }
+
+  .next-step-section {
+    padding: 6pt 8pt;
+    border-left-width: 4pt;
+  }
+
+  .radar-svg {
+    max-width: 3.05in;
+  }
+
+  .radar-label {
+    font-size: 12px;
+  }
+
+  .radar-legend text {
+    font-size: 10px;
+  }
+
+  .radar-note {
+    margin-top: 1pt !important;
+    font-size: 6.7pt !important;
+  }
+
+  .own-words-section blockquote {
+    margin: 0;
+  }
+
+  .profile-fluidity-note {
+    margin: 6pt 0 0;
+    font-size: 6.8pt;
+    line-height: 1.2;
+  }
+
+  /* ========================================================
+     PRINT PAGE 2
+  ======================================================== */
+
+  .score-details {
+    display: block;
+
+    break-before: page;
+    page-break-before: always;
+
+    margin: 0;
+    padding: 0;
+
+    border: 0;
+    border-radius: 0;
+
+    background: #ffffff;
+  }
+
+  .score-details summary {
+    display: none !important;
+  }
+
+  /*
+   * Defensive rule so the contents print
+   * even if a browser ignores the scripted
+   * details.open change.
+   */
+  .score-details > *:not(summary) {
+    display: block !important;
+  }
+
+  .score-page-header {
+    margin: 0 0 4pt;
+  }
+
+  .print-score-title {
+    margin: 0;
+    font-size: 17pt;
+    line-height: 1.05;
+  }
+
+  .signals-not-grades {
+    margin: 6pt 0;
+    padding: 5pt 7pt;
+    border-left-width: 3pt;
+  }
+
+  .signals-not-grades strong {
+    margin-bottom: 1pt;
+    font-size: 8.2pt;
+  }
+
+  .signals-not-grades p {
+    font-size: 7.4pt;
+    line-height: 1.24;
+  }
+
+  .score-explainer {
+    margin: 0 0 7pt;
+    font-size: 7.1pt;
+    line-height: 1.25;
+  }
+
+  .score-family-grid {
+    display: grid !important;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap: 7pt 12pt;
+  }
+
+  .score-family-panel {
+    padding: 6pt 7pt;
+
+    border-width: 0.7pt;
+    border-top-width: 3pt;
+
+    border-radius: 4pt;
+
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .score-family-panel h4 {
+    margin: 0 0 4pt;
+    font-size: 9pt;
+  }
+
+  .score-family-rows {
+    gap: 5pt;
+  }
+
+  .score-row-heading {
+    margin-bottom: 1.5pt;
+    font-size: 7.7pt;
+  }
+
+  .score-meter {
+    height: 4pt;
+  }
+
+  .score-answer-count {
+    margin-top: 1pt;
+    font-size: 6.2pt;
+    line-height: 1.15;
+  }
+
+  /* ========================================================
+     PRINT METHODOLOGY
+  ======================================================== */
+
+  .methodology-section {
+    margin-top: 8pt;
+    padding-top: 7pt;
+    border-top-width: 1pt;
+  }
+
+  .methodology-section h3 {
+    margin: 0 0 3pt;
+    font-size: 10.5pt;
+  }
+
+  .methodology-intro {
+    margin: 0 0 3pt !important;
+    font-size: 6.8pt;
+    line-height: 1.23 !important;
+  }
+
+  .methodology-grid {
+    display: grid !important;
+
+    grid-template-columns:
+      1fr
+      1fr;
+
+    gap: 4pt 7pt;
+
+    margin-top: 5pt;
+  }
+
+  .methodology-lens {
+    padding: 4pt 5pt;
+    border-width: 0.6pt;
+    border-radius: 3pt;
+
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .methodology-lens h4 {
+    margin: 0 0 1.5pt;
+    font-size: 7.4pt;
+    line-height: 1.12;
+  }
+
+  .methodology-lens p {
+    font-size: 6.2pt;
+    line-height: 1.18;
+  }
+
+  .methodology-map {
+    margin-top: 2pt !important;
+    font-size: 5.8pt !important;
   }
 }
