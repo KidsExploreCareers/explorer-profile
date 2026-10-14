@@ -396,9 +396,9 @@ textarea {
 .profile-top-grid {
   display: grid;
   grid-template-columns:
-    minmax(0, 1fr)
-    minmax(0, 1fr);
-  gap: 28px;
+    minmax(0, 0.82fr)
+    minmax(0, 1.18fr);
+  gap: 26px;
   align-items: start;
 }
 
@@ -421,14 +421,38 @@ textarea {
   margin: 0;
 }
 
+/* ==========================================================
+   STANDOUT SIGNAL LINKAGE
+========================================================== */
+
 .standout-list {
   margin: 0;
-  padding-left: 1.25rem;
+  padding: 0;
+  list-style: none;
 }
 
 .standout-list li {
-  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-bottom: 11px;
   line-height: 1.5;
+}
+
+.standout-marker {
+  flex: 0 0 auto;
+  position: relative;
+  top: 1px;
+  color: var(--gold);
+  font-size: 1.05em;
+  line-height: 1.35;
+  text-shadow:
+    0 0 0.5px #a66c00;
+}
+
+.standout-list strong {
+  color: var(--blue);
+  font-weight: 900;
 }
 
 .balanced-callout {
@@ -469,7 +493,7 @@ textarea {
 .radar-svg {
   display: block;
   width: 100%;
-  max-width: 470px;
+  max-width: 520px;
   height: auto;
   margin: 0 auto;
   overflow: visible;
@@ -483,31 +507,44 @@ textarea {
 
 .radar-thinking {
   stroke: var(--thinking);
-  stroke-width: 5;
-  opacity: 0.7;
+  stroke-width: 5.5;
+  opacity: 0.72;
 }
 
 .radar-action {
   stroke: var(--action);
-  stroke-width: 5;
-  opacity: 0.7;
+  stroke-width: 5.5;
+  opacity: 0.72;
 }
 
 .radar-helping {
   stroke: var(--helping);
-  stroke-width: 5;
-  opacity: 0.7;
+  stroke-width: 5.5;
+  opacity: 0.72;
 }
 
 .radar-organization {
   stroke: var(--organization);
   stroke-width: 5;
-  opacity: 0.82;
+  opacity: 0.85;
 }
 
 .radar-point {
   stroke: none;
-  opacity: 0.8;
+  opacity: 0.92;
+}
+
+.radar-point-top {
+  stroke: #ffffff;
+  stroke-width: 2.5;
+  opacity: 1;
+}
+
+.radar-standout-halo {
+  fill: var(--gold);
+  stroke: #ffffff;
+  stroke-width: 2;
+  opacity: 1;
 }
 
 .radar-thinking-point,
@@ -528,11 +565,27 @@ textarea {
 .radar-label {
   fill: var(--ink);
   font-family: var(--font-main);
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .radar-label-top {
+  fill: var(--blue);
+  stroke: #ffffff;
+  stroke-width: 3px;
+  paint-order: stroke fill;
+  stroke-linejoin: round;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.radar-standout-star {
+  fill: var(--gold);
+  stroke: #ffffff;
+  stroke-width: 1.5px;
+  paint-order: stroke fill;
+  font-family: Arial, sans-serif;
+  font-size: 17px;
   font-weight: 900;
 }
 
@@ -553,8 +606,20 @@ textarea {
   stroke-linecap: round;
 }
 
+.radar-standout-note {
+  margin: -2px auto 0 !important;
+  color: var(--blue);
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.2 !important;
+}
+
+.radar-standout-note span {
+  color: var(--gold);
+}
+
 .radar-note {
-  margin: 8px auto 0 !important;
+  margin: 7px auto 0 !important;
   max-width: 420px;
   color: var(--muted);
   font-size: 0.8rem;
@@ -922,6 +987,10 @@ button:focus-visible,
     font-size: 14px;
   }
 
+  .radar-label-top {
+    font-size: 16px;
+  }
+
   .score-details {
     padding: 15px;
   }
@@ -929,13 +998,11 @@ button:focus-visible,
 
 /* ==========================================================
    PRINT / SAVE AS PDF
-   PAGE 1 = PROFILE
-   PAGE 2 = SIGNAL SCORES + METHODOLOGY
 ========================================================== */
 
 @page {
   size: Letter portrait;
-  margin: 0.32in;
+  margin: 0.30in;
 }
 
 @media print {
@@ -947,7 +1014,7 @@ button:focus-visible,
   }
 
   body {
-    font-size: 9.5pt;
+    font-size: 10pt;
     color: #000000;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -975,31 +1042,27 @@ button:focus-visible,
     box-shadow: none;
   }
 
-  /*
-   * Darker secondary text for ordinary
-   * home and school printers.
-   */
   .profile-date,
   .radar-note,
   .profile-fluidity-note,
   .score-explainer,
   .score-answer-count,
   .methodology-map {
-    color: #4b5563 !important;
+    color: #46505c !important;
   }
 
   .print-brand {
     display: block;
     margin: 0 0 4pt !important;
     color: var(--blue);
-    font-size: 8.4pt;
+    font-size: 8.7pt;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
 
   /* ========================================================
-     PRINT PAGE 1
+     PAGE 1 — ROOMY DEFAULT
   ======================================================== */
 
   .profile-results-header {
@@ -1009,22 +1072,18 @@ button:focus-visible,
 
   .profile-results-header h2 {
     margin: 0 0 2pt;
-    font-size: 19.5pt;
+    font-size: 20pt;
     line-height: 1.05;
   }
 
   .profile-date {
-    font-size: 8.2pt;
+    font-size: 8.4pt;
   }
 
-  /*
-   * Give the map slightly more of the
-   * top row than the text column.
-   */
   .profile-top-grid {
     grid-template-columns:
-      0.88fr
-      1.12fr;
+      0.80fr
+      1.20fr;
     gap: 13pt;
     align-items: start;
   }
@@ -1042,23 +1101,24 @@ button:focus-visible,
 
   .profile-section h3 {
     margin: 0 0 4pt;
-    font-size: 12pt;
+    font-size: 12.3pt;
     line-height: 1.12;
   }
 
   .profile-section p,
   .standout-list li,
   .own-words-section blockquote {
-    font-size: 9.15pt;
+    font-size: 9.45pt;
     line-height: 1.34;
   }
 
-  .standout-list {
-    padding-left: 14pt;
+  .standout-list li {
+    margin-bottom: 4.5pt;
+    gap: 5pt;
   }
 
-  .standout-list li {
-    margin-bottom: 4pt;
+  .standout-marker {
+    font-size: 10pt;
   }
 
   .balanced-callout {
@@ -1071,18 +1131,32 @@ button:focus-visible,
   }
 
   /*
-   * Larger Explorer Map.
+   * Larger chart, but still leaves room for
+   * the labels surrounding the radar.
    */
   .radar-svg {
-    max-width: 3.58in;
+    max-width: 3.92in;
   }
 
   .radar-label {
-    font-size: 14px;
+    font-size: 16px;
+  }
+
+  .radar-label-top {
+    font-size: 18.5px;
+  }
+
+  .radar-standout-star {
+    font-size: 18px;
   }
 
   .radar-legend text {
-    font-size: 11.5px;
+    font-size: 12px;
+  }
+
+  .radar-standout-note {
+    margin-top: 0 !important;
+    font-size: 7.8pt !important;
   }
 
   .radar-note {
@@ -1096,13 +1170,121 @@ button:focus-visible,
   }
 
   .profile-fluidity-note {
-    margin: 9pt 0 0;
-    font-size: 7.7pt;
+    margin: 8pt 0 0;
+    font-size: 7.8pt;
     line-height: 1.28;
   }
 
   /* ========================================================
-     PRINT PAGE 2
+     AUTOMATIC PAGE 1 DENSITY
+  ======================================================== */
+
+  .print-density-medium
+  .profile-section {
+    margin-top: 7pt;
+  }
+
+  .print-density-medium
+  .profile-section h3 {
+    font-size: 11.8pt;
+  }
+
+  .print-density-medium
+  .profile-section p,
+  .print-density-medium
+  .standout-list li,
+  .print-density-medium
+  .own-words-section blockquote {
+    font-size: 9pt;
+    line-height: 1.30;
+  }
+
+  .print-density-medium
+  .standout-list li {
+    margin-bottom: 3.5pt;
+  }
+
+  .print-density-medium
+  .radar-svg {
+    max-width: 3.72in;
+  }
+
+  .print-density-medium
+  .next-step-section {
+    padding: 6pt 8pt;
+  }
+
+  .print-density-medium
+  .profile-fluidity-note {
+    margin-top: 6pt;
+    font-size: 7.4pt;
+  }
+
+
+  .print-density-tight
+  .profile-results-header {
+    margin-bottom: 6pt;
+  }
+
+  .print-density-tight
+  .profile-results-header h2 {
+    font-size: 18.5pt;
+  }
+
+  .print-density-tight
+  .profile-section {
+    margin-top: 5.5pt;
+  }
+
+  .print-density-tight
+  .profile-section h3 {
+    margin-bottom: 2.5pt;
+    font-size: 11.2pt;
+  }
+
+  .print-density-tight
+  .profile-section p,
+  .print-density-tight
+  .standout-list li,
+  .print-density-tight
+  .own-words-section blockquote {
+    font-size: 8.45pt;
+    line-height: 1.25;
+  }
+
+  .print-density-tight
+  .standout-list li {
+    margin-bottom: 2.5pt;
+  }
+
+  .print-density-tight
+  .radar-svg {
+    max-width: 3.48in;
+  }
+
+  .print-density-tight
+  .radar-label {
+    font-size: 14px;
+  }
+
+  .print-density-tight
+  .radar-label-top {
+    font-size: 16.5px;
+  }
+
+  .print-density-tight
+  .next-step-section {
+    padding: 5pt 7pt;
+  }
+
+  .print-density-tight
+  .profile-fluidity-note {
+    margin-top: 5pt;
+    font-size: 7pt;
+  }
+
+  /* ========================================================
+     PAGE 2
   ======================================================== */
 
   .score-details {
@@ -1124,16 +1306,6 @@ button:focus-visible,
     display: none !important;
   }
 
-  /*
-   * Reveal the direct Page 2 sections if
-   * <details> was closed on screen.
-   *
-   * IMPORTANT:
-   * We do NOT force every child to block
-   * because that was overriding the score
-   * grid and causing the four families to
-   * print as four full-width rows.
-   */
   .score-details > .score-page-header,
   .score-details > .signals-not-grades,
   .score-details > .score-explainer,
@@ -1141,12 +1313,6 @@ button:focus-visible,
     display: block !important;
   }
 
-  /*
-   * TRUE 2x2 layout:
-   *
-   * Thinking       Action
-   * Helping        Organization
-   */
   .score-details > .score-family-grid {
     display: grid !important;
 
@@ -1163,34 +1329,34 @@ button:focus-visible,
 
   .print-score-title {
     margin: 0;
-    font-size: 19pt;
+    font-size: 20pt;
     line-height: 1.05;
   }
 
   .signals-not-grades {
     margin: 7pt 0;
-    padding: 7pt 9pt;
+    padding: 7.5pt 9pt;
     border-left-width: 4pt;
   }
 
   .signals-not-grades strong {
     margin-bottom: 2pt;
-    font-size: 9.2pt;
+    font-size: 9.6pt;
   }
 
   .signals-not-grades p {
-    font-size: 8.3pt;
-    line-height: 1.3;
+    font-size: 8.8pt;
+    line-height: 1.30;
   }
 
   .score-explainer {
     margin: 0 0 9pt;
-    font-size: 7.9pt;
-    line-height: 1.3;
+    font-size: 8.35pt;
+    line-height: 1.32;
   }
 
   .score-family-panel {
-    padding: 8pt 9pt;
+    padding: 9pt 10pt;
 
     border-width: 0.8pt;
     border-top-width: 4pt;
@@ -1203,17 +1369,17 @@ button:focus-visible,
 
   .score-family-panel h4 {
     margin: 0 0 6pt;
-    font-size: 10.8pt;
+    font-size: 11.7pt;
     line-height: 1.1;
   }
 
   .score-family-rows {
-    gap: 7pt;
+    gap: 7.5pt;
   }
 
   .score-row-heading {
-    margin-bottom: 2pt;
-    font-size: 9pt;
+    margin-bottom: 2.5pt;
+    font-size: 9.7pt;
     line-height: 1.15;
   }
 
@@ -1222,17 +1388,17 @@ button:focus-visible,
   }
 
   .score-meter {
-    height: 5pt;
+    height: 5.5pt;
   }
 
   .score-answer-count {
     margin-top: 2pt;
-    font-size: 7.2pt;
+    font-size: 7.7pt;
     line-height: 1.2;
   }
 
   /* ========================================================
-     PRINT METHODOLOGY
+     PAGE 2 METHODOLOGY
   ======================================================== */
 
   .methodology-section {
@@ -1243,14 +1409,14 @@ button:focus-visible,
 
   .methodology-section h3 {
     margin: 0 0 5pt;
-    font-size: 11.5pt;
+    font-size: 12pt;
   }
 
   .methodology-intro {
     margin: 0 0 4pt !important;
     color: #252a31 !important;
-    font-size: 7.75pt;
-    line-height: 1.3 !important;
+    font-size: 8.25pt;
+    line-height: 1.30 !important;
   }
 
   .methodology-grid {
@@ -1266,7 +1432,7 @@ button:focus-visible,
   }
 
   .methodology-lens {
-    padding: 6pt 7pt;
+    padding: 6.5pt 7.5pt;
 
     border-width: 0.7pt;
     border-radius: 4pt;
@@ -1277,18 +1443,18 @@ button:focus-visible,
 
   .methodology-lens h4 {
     margin: 0 0 2pt;
-    font-size: 8.4pt;
+    font-size: 8.9pt;
     line-height: 1.15;
   }
 
   .methodology-lens p {
-    font-size: 7pt;
+    font-size: 7.45pt;
     line-height: 1.23;
   }
 
   .methodology-map {
     margin-top: 3pt !important;
-    font-size: 6.45pt !important;
+    font-size: 6.85pt !important;
     line-height: 1.18 !important;
   }
 }
