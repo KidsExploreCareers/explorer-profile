@@ -810,7 +810,7 @@ textarea {
 }
 
 .methodology-intro {
-  margin: 0 0 10px !important;
+  margin: 0 !important;
   color: #30343a;
   font-size: 0.91rem;
   line-height: 1.48 !important;
@@ -824,7 +824,7 @@ textarea {
       minmax(0, 1fr)
     );
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 .methodology-lens {
@@ -832,6 +832,13 @@ textarea {
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 9px;
+  text-align: left;
+}
+
+.methodology-lens-wide {
+  grid-column: 1 / -1;
+  width: 55%;
+  justify-self: center;
 }
 
 .methodology-lens h4 {
@@ -910,6 +917,11 @@ button:focus-visible,
   .score-family-grid,
   .methodology-grid {
     grid-template-columns: 1fr;
+  }
+
+  .methodology-lens-wide {
+    grid-column: auto;
+    width: 100%;
   }
 
   .standout-section {
@@ -1388,21 +1400,21 @@ button:focus-visible,
   ======================================================== */
 
   .methodology-section {
-    margin-top: 11pt;
-    padding-top: 9pt;
+    margin-top: 8pt;
+    padding-top: 7pt;
     border-top-width: 1pt;
   }
 
   .methodology-section h3 {
-    margin: 0 0 5pt;
+    margin: 0 0 4pt;
     font-size: 12pt;
   }
 
   .methodology-intro {
-    margin: 0 0 4pt !important;
+    margin: 0 !important;
     color: #252a31 !important;
     font-size: 8.5pt;
-    line-height: 1.30 !important;
+    line-height: 1.28 !important;
   }
 
   .methodology-grid {
@@ -1412,19 +1424,31 @@ button:focus-visible,
       minmax(0, 1fr)
       minmax(0, 1fr);
 
-    gap: 6pt 9pt;
+    gap: 5pt 9pt;
 
-    margin-top: 7pt;
+    margin-top: 5pt;
   }
 
   .methodology-lens {
-    padding: 6.5pt 7.5pt;
+    padding: 6pt 7.5pt;
 
     border-width: 0.7pt;
     border-radius: 4pt;
 
+    text-align: left;
+
     break-inside: avoid;
     page-break-inside: avoid;
+  }
+
+  .methodology-lens-wide {
+    grid-column: 1 / -1;
+
+    width: 55%;
+
+    justify-self: center;
+
+    text-align: left;
   }
 
   .methodology-lens h4 {
@@ -1435,12 +1459,12 @@ button:focus-visible,
 
   .methodology-lens p {
     font-size: 7.85pt;
-    line-height: 1.23;
+    line-height: 1.22;
   }
 
   .methodology-map {
-    margin-top: 3pt !important;
+    margin-top: 2.5pt !important;
     font-size: 7.25pt !important;
-    line-height: 1.18 !important;
+    line-height: 1.17 !important;
   }
 }
