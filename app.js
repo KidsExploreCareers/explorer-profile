@@ -21,13 +21,20 @@
   const PROFILE_RULES = {
     topThreshold: 0.05,
     bottomThreshold: 0.05,
+
     reportMinTopSignals: 3,
     reportMaxTopSignals: 5,
+
     integrativeEvenRangeMax: 0.18,
     integrativePeakGapMin: 0.14,
     integrativeStrongPeakMin: 0.78,
+
     meaningfulReflectionMinWords: 2,
-    learnBestMaxWords: 95,
+
+    learnBestRoomyWords: 80,
+    learnBestMediumWords: 65,
+    learnBestTightWords: 50,
+
     integrativeMaxWords: 95
   };
 
@@ -41,10 +48,13 @@
   const FAMILY_DESCRIPTORS = {
     Thinking:
       "wondering, making connections, imagining possibilities, and reflecting on ideas",
+
     Action:
       "getting started, sticking with challenges, experimenting, and learning by doing",
+
     Helping:
       "explaining, supporting, collaborating, and working with other people",
+
     Organization:
       "planning, creating structure, and knowing what comes next"
   };
@@ -52,10 +62,13 @@
   const FAMILY_LEARNING_TEXT = {
     Thinking:
       "You may learn especially well when there is time to wonder, make connections, explore possibilities, and think ideas through before moving on.",
+
     Action:
       "You may learn especially well when you can take a first step, try something for yourself, and improve it as you go.",
+
     Helping:
       "You may learn especially well when you can talk ideas through, support someone else, or work toward a goal with other people.",
+
     Organization:
       "You may learn especially well when expectations are clear, there is a plan to follow, and you know what comes next."
   };
@@ -73,199 +86,477 @@
   ];
 
   const RADAR_FAMILIES = {
-    Thinking: ["Curiosity", "Creativity", "Reflection"],
-    Action: ["Initiative", "Persistence", "Reasoning"],
-    Helping: ["Instruction", "Empathy", "Collaboration"]
+    Thinking: [
+      "Curiosity",
+      "Creativity",
+      "Reflection"
+    ],
+
+    Action: [
+      "Initiative",
+      "Persistence",
+      "Reasoning"
+    ],
+
+    Helping: [
+      "Instruction",
+      "Empathy",
+      "Collaboration"
+    ]
   };
 
   const QUESTION_LENSES = [
     {
       title: "What I Enjoy and Wonder About",
+
       description:
         "These questions are about what you enjoy, what interests you, and what naturally grabs your attention.",
-      signals: ["Curiosity", "Creativity"],
-      families: ["Thinking"]
+
+      signals: [
+        "Curiosity",
+        "Creativity"
+      ],
+
+      families: [
+        "Thinking"
+      ]
     },
+
     {
       title: "How I Like to Think",
+
       description:
         "These questions are about how you think about ideas, choices, and experiences.",
-      signals: ["Reflection"],
-      families: ["Thinking"]
+
+      signals: [
+        "Reflection"
+      ],
+
+      families: [
+        "Thinking"
+      ]
     },
+
     {
       title: "How I Start and Keep Going",
+
       description:
         "These questions are about how you begin things, stick with them, and grow while working on something over time.",
-      signals: ["Initiative", "Persistence"],
-      families: ["Action"]
+
+      signals: [
+        "Initiative",
+        "Persistence"
+      ],
+
+      families: [
+        "Action"
+      ]
     },
+
     {
       title: "How I Solve Problems and Help",
+
       description:
         "These questions are about how you approach problems, help others, and work on things that matter.",
-      signals: ["Reasoning", "Instruction"],
-      families: ["Action", "Helping"]
+
+      signals: [
+        "Reasoning",
+        "Instruction"
+      ],
+
+      families: [
+        "Action",
+        "Helping"
+      ]
     },
+
     {
       title: "How I Work With Others and Stay Organized",
+
       description:
         "These questions are about how you like to work with people, follow routines, and keep things organized.",
-      signals: ["Empathy", "Collaboration", "Organization"],
-      families: ["Helping", "Organization"]
+
+      signals: [
+        "Empathy",
+        "Collaboration",
+        "Organization"
+      ],
+
+      families: [
+        "Helping",
+        "Organization"
+      ]
     }
   ];
 
   const CLUSTER_RULES = [
     {
       key: "cluster_curiosity_creativity",
-      signals: ["Curiosity", "Creativity"]
+
+      signals: [
+        "Curiosity",
+        "Creativity"
+      ]
     },
+
     {
       key: "cluster_curiosity_reasoning",
-      signals: ["Curiosity", "Reasoning"]
+
+      signals: [
+        "Curiosity",
+        "Reasoning"
+      ]
     },
+
     {
       key: "cluster_persistence_organization",
-      signals: ["Persistence", "Organization"]
+
+      signals: [
+        "Persistence",
+        "Organization"
+      ]
     },
+
     {
       key: "cluster_empathy_instruction",
-      signals: ["Empathy", "Instruction"]
+
+      signals: [
+        "Empathy",
+        "Instruction"
+      ]
     },
+
     {
       key: "cluster_collaboration_empathy",
-      signals: ["Collaboration", "Empathy"]
+
+      signals: [
+        "Collaboration",
+        "Empathy"
+      ]
     }
   ];
 
-  const QUESTION_BY_ID = new Map(
-    data.questions.map((question) => [question.id, question])
-  );
+  const QUESTION_BY_ID =
+    new Map(
+      data.questions.map(
+        (question) => [
+          question.id,
+          question
+        ]
+      )
+    );
 
-  const SIGNAL_FAMILY = new Map(
-    data.signals.map((signal) => [signal.name, signal.family])
-  );
+  const SIGNAL_FAMILY =
+    new Map(
+      data.signals.map(
+        (signal) => [
+          signal.name,
+          signal.family
+        ]
+      )
+    );
 
   const state = {
     name: "",
+
     currentQuestionIndex: 0,
+
     questionOrder: [],
+
     answers: {},
+
     reflectionEnjoy: "",
+
     reflectionSurprise: ""
   };
 
-  const appCard = document.getElementById("app-card");
-  let scoreDetailsOpenBeforePrint = null;
+  const appCard =
+    document.getElementById(
+      "app-card"
+    );
+
+  let scoreDetailsOpenBeforePrint =
+    null;
+
 
   /* ==========================================================
      GENERAL HELPERS
   ========================================================== */
 
   function escapeHtml(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+    return String(
+      value ?? ""
+    )
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
   }
 
-  function toSignalSlug(signalName) {
-    return String(signalName || "")
+
+  function toSignalSlug(
+    signalName
+  ) {
+    return String(
+      signalName || ""
+    )
       .trim()
       .toLowerCase()
-      .replaceAll("&", "and")
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "");
+      .replaceAll(
+        "&",
+        "and"
+      )
+      .replace(
+        /[^a-z0-9]+/g,
+        "_"
+      )
+      .replace(
+        /^_+|_+$/g,
+        ""
+      );
   }
 
-  function ensureSentence(value) {
-    const text = String(value || "").trim();
-    if (!text) return "";
-    return /[.!?]$/.test(text) ? text : `${text}.`;
+
+  function ensureSentence(
+    value
+  ) {
+    const text =
+      String(
+        value || ""
+      ).trim();
+
+    if (!text) {
+      return "";
+    }
+
+    return /[.!?]$/.test(
+      text
+    )
+      ? text
+      : `${text}.`;
   }
 
-  function countWords(value) {
-    const text = String(value || "").trim();
-    if (!text) return 0;
-    return text.split(/\s+/).filter(Boolean).length;
+
+  function countWords(
+    value
+  ) {
+    const text =
+      String(
+        value || ""
+      ).trim();
+
+    if (!text) {
+      return 0;
+    }
+
+    return text
+      .split(/\s+/)
+      .filter(Boolean)
+      .length;
   }
 
-  function truncateToWords(value, maxWords) {
-    const text = String(value || "").trim();
-    const words = text.split(/\s+/).filter(Boolean);
 
-    if (words.length <= maxWords) return text;
+  function truncateToWords(
+    value,
+    maxWords
+  ) {
+    const text =
+      String(
+        value || ""
+      ).trim();
+
+    const words =
+      text
+        .split(/\s+/)
+        .filter(Boolean);
+
+    if (
+      words.length <=
+      maxWords
+    ) {
+      return text;
+    }
 
     return (
       words
-        .slice(0, maxWords)
+        .slice(
+          0,
+          maxWords
+        )
         .join(" ")
-        .replace(/[,;:–—-]+$/, "") + "…"
+        .replace(
+          /[,;:–—-]+$/,
+          ""
+        ) +
+      "…"
     );
   }
 
-  function composeNarrative(parts, maxWords) {
-    const cleaned = parts.map(ensureSentence).filter(Boolean);
 
-    if (cleaned.length === 0) return "";
+  function composeNarrative(
+    parts,
+    maxWords
+  ) {
+    const cleaned =
+      parts
+        .map(
+          (part) =>
+            ensureSentence(
+              part
+            )
+        )
+        .filter(Boolean);
 
-    const result = [];
-    let usedWords = 0;
-
-    for (const part of cleaned) {
-      const words = countWords(part);
-
-      if (result.length === 0 && words > maxWords) {
-        return truncateToWords(part, maxWords);
-      }
-
-      if (usedWords + words > maxWords) continue;
-
-      result.push(part);
-      usedWords += words;
+    if (
+      cleaned.length ===
+      0
+    ) {
+      return "";
     }
 
-    return result.join(" ");
+    const result = [];
+
+    let usedWords = 0;
+
+    for (
+      const part
+      of cleaned
+    ) {
+      const words =
+        countWords(
+          part
+        );
+
+      if (
+        result.length ===
+          0 &&
+        words >
+          maxWords
+      ) {
+        return truncateToWords(
+          part,
+          maxWords
+        );
+      }
+
+      if (
+        usedWords +
+          words >
+        maxWords
+      ) {
+        continue;
+      }
+
+      result.push(
+        part
+      );
+
+      usedWords +=
+        words;
+    }
+
+    return result.join(
+      " "
+    );
   }
 
-  function hashString(value) {
-    const text = String(value || "");
+
+  function hashString(
+    value
+  ) {
+    const text =
+      String(
+        value || ""
+      );
+
     let hash = 0;
 
-    for (let i = 0; i < text.length; i += 1) {
-      hash = ((hash << 5) - hash) + text.charCodeAt(i);
+    for (
+      let i = 0;
+      i < text.length;
+      i += 1
+    ) {
+      hash =
+        (
+          (hash << 5) -
+          hash
+        ) +
+        text.charCodeAt(i);
+
       hash |= 0;
     }
 
     return hash;
   }
 
+
   function getProfileSeed() {
     return data.questions
-      .map((question) => {
-        const value = state.answers[question.id];
+      .map(
+        (question) => {
+          const value =
+            state.answers[
+              question.id
+            ];
 
-        return value === undefined
-          ? `${question.id}:_`
-          : `${question.id}:${value}`;
-      })
+          return value ===
+            undefined
+            ? `${question.id}:_`
+            : `${question.id}:${value}`;
+        }
+      )
       .join("|");
   }
 
-  function pickNarrativeVariant(key, seedSuffix = "") {
-    const value = narratives[key];
 
-    if (!value) return null;
-    if (typeof value === "string") return value;
+  function pickNarrativeVariant(
+    key,
+    seedSuffix = ""
+  ) {
+    const value =
+      narratives[key];
 
-    const seed = `${key}::${getProfileSeed()}::${seedSuffix}`;
-    const index = Math.abs(hashString(seed)) % value.length;
+    if (!value) {
+      return null;
+    }
+
+    if (
+      typeof value ===
+      "string"
+    ) {
+      return value;
+    }
+
+    const seed =
+      `${key}::${getProfileSeed()}::${seedSuffix}`;
+
+    const index =
+      Math.abs(
+        hashString(
+          seed
+        )
+      ) %
+      value.length;
 
     return value[index];
   }
+
 
   function scrollToCard() {
     appCard.scrollIntoView({
@@ -274,6 +565,7 @@
     });
   }
 
+
   /* ==========================================================
      LOCAL RANDOMIZATION
   ========================================================== */
@@ -281,38 +573,66 @@
   function randomUnit() {
     if (
       window.crypto &&
-      typeof window.crypto.getRandomValues === "function"
+      typeof window.crypto
+        .getRandomValues ===
+        "function"
     ) {
-      const array = new Uint32Array(1);
-      window.crypto.getRandomValues(array);
+      const array =
+        new Uint32Array(1);
 
-      return array[0] / 4294967296;
+      window.crypto
+        .getRandomValues(
+          array
+        );
+
+      return (
+        array[0] /
+        4294967296
+      );
     }
 
     return Math.random();
   }
 
-  function randomChoice(items) {
-    if (!items || items.length === 0) return null;
 
-    const index = Math.floor(
-      randomUnit() * items.length
-    );
+  function randomChoice(
+    items
+  ) {
+    if (
+      !items ||
+      items.length ===
+        0
+    ) {
+      return null;
+    }
+
+    const index =
+      Math.floor(
+        randomUnit() *
+        items.length
+      );
 
     return items[index];
   }
 
-  function shuffledCopy(items) {
-    const result = [...items];
+
+  function shuffledCopy(
+    items
+  ) {
+    const result =
+      [...items];
 
     for (
-      let i = result.length - 1;
+      let i =
+        result.length - 1;
       i > 0;
       i -= 1
     ) {
-      const j = Math.floor(
-        randomUnit() * (i + 1)
-      );
+      const j =
+        Math.floor(
+          randomUnit() *
+          (i + 1)
+        );
 
       [
         result[i],
@@ -326,32 +646,42 @@
     return result;
   }
 
+
   function buildBalancedQuestionOrder() {
-    const bySignal = new Map();
+    const bySignal =
+      new Map();
 
-    data.signals.forEach((signal) => {
-      bySignal.set(
-        signal.name,
-        []
-      );
-    });
-
-    data.questions.forEach((question) => {
-      if (
-        !bySignal.has(
-          question.signal
-        )
-      ) {
+    data.signals.forEach(
+      (signal) => {
         bySignal.set(
-          question.signal,
+          signal.name,
           []
         );
       }
+    );
 
-      bySignal
-        .get(question.signal)
-        .push(question);
-    });
+    data.questions.forEach(
+      (question) => {
+        if (
+          !bySignal.has(
+            question.signal
+          )
+        ) {
+          bySignal.set(
+            question.signal,
+            []
+          );
+        }
+
+        bySignal
+          .get(
+            question.signal
+          )
+          .push(
+            question
+          );
+      }
+    );
 
     for (
       const [
@@ -362,7 +692,9 @@
     ) {
       bySignal.set(
         signalName,
-        shuffledCopy(questions)
+        shuffledCopy(
+          questions
+        )
       );
     }
 
@@ -376,7 +708,8 @@
         )
       );
 
-    const orderedQuestions = [];
+    const orderedQuestions =
+      [];
 
     for (
       let round = 0;
@@ -390,25 +723,31 @@
           ).filter(
             (signalName) =>
               bySignal
-                .get(signalName)[round]
+                .get(
+                  signalName
+                )[round]
           )
         );
 
       while (
-        remainingSignals.length > 0
+        remainingSignals.length >
+        0
       ) {
         const previousQuestion =
           orderedQuestions[
-            orderedQuestions.length - 1
+            orderedQuestions.length -
+            1
           ];
 
         const secondPreviousQuestion =
           orderedQuestions[
-            orderedQuestions.length - 2
+            orderedQuestions.length -
+            2
           ];
 
         const previousSignal =
-          previousQuestion?.signal;
+          previousQuestion
+            ?.signal;
 
         const previousFamily =
           previousQuestion
@@ -452,7 +791,8 @@
           );
 
         if (
-          candidates.length === 0
+          candidates.length ===
+          0
         ) {
           candidates =
             remainingSignals.filter(
@@ -463,14 +803,19 @@
         }
 
         if (
-          candidates.length === 0
+          candidates.length ===
+          0
         ) {
           candidates =
-            [...remainingSignals];
+            [
+              ...remainingSignals
+            ];
         }
 
         const recentQuestions =
-          orderedQuestions.slice(-5);
+          orderedQuestions.slice(
+            -5
+          );
 
         const recentFamilyCounts =
           new Map();
@@ -496,8 +841,10 @@
               (
                 recentFamilyCounts.get(
                   family
-                ) || 0
-              ) + 1
+                ) ||
+                0
+              ) +
+              1
             );
           }
         );
@@ -510,7 +857,8 @@
                   SIGNAL_FAMILY.get(
                     signalName
                   )
-                ) || 0
+                ) ||
+                0
             )
           );
 
@@ -522,7 +870,8 @@
                   SIGNAL_FAMILY.get(
                     signalName
                   )
-                ) || 0
+                ) ||
+                0
               ) ===
               minimumRecentCount
           );
@@ -536,7 +885,9 @@
 
         const chosenQuestion =
           bySignal
-            .get(chosenSignal)[round];
+            .get(
+              chosenSignal
+            )[round];
 
         orderedQuestions.push(
           chosenQuestion
@@ -557,6 +908,7 @@
     );
   }
 
+
   function ensureQuestionOrder() {
     if (
       state.questionOrder.length ===
@@ -569,6 +921,7 @@
       buildBalancedQuestionOrder();
   }
 
+
   function getCurrentQuestion() {
     ensureQuestionOrder();
 
@@ -580,9 +933,11 @@
     return (
       QUESTION_BY_ID.get(
         questionId
-      ) || null
+      ) ||
+      null
     );
   }
+
 
   /* ==========================================================
      PRINTING
@@ -594,7 +949,9 @@
         ".score-details"
       );
 
-    if (!details) return;
+    if (!details) {
+      return;
+    }
 
     if (
       scoreDetailsOpenBeforePrint ===
@@ -604,8 +961,10 @@
         details.open;
     }
 
-    details.open = true;
+    details.open =
+      true;
   }
+
 
   function restoreAfterPrint() {
     const details =
@@ -626,24 +985,30 @@
       null;
   }
 
+
   function printProfile() {
     prepareForPrint();
 
     window.setTimeout(
-      () => window.print(),
+      () => {
+        window.print();
+      },
       0
     );
   }
+
 
   window.addEventListener(
     "beforeprint",
     prepareForPrint
   );
 
+
   window.addEventListener(
     "afterprint",
     restoreAfterPrint
   );
+
 
   /* ==========================================================
      WELCOME
@@ -668,6 +1033,7 @@
       </p>
 
       <div class="privacy-note">
+
         <strong>
           Your answers stay private.
         </strong>
@@ -676,6 +1042,7 @@
 
         Your questionnaire answers are processed in your browser
         and are not submitted to or stored by Kids Explore Careers.
+
       </div>
 
       <button
@@ -700,11 +1067,14 @@
         "click",
         () => {
           ensureQuestionOrder();
+
           renderNameScreen();
+
           scrollToCard();
         }
       );
   }
+
 
   /* ==========================================================
      NAME
@@ -776,6 +1146,7 @@
         "click",
         () => {
           renderWelcome();
+
           scrollToCard();
         }
       );
@@ -799,10 +1170,12 @@
             0;
 
           renderQuestion();
+
           scrollToCard();
         }
       );
   }
+
 
   /* ==========================================================
      QUESTIONS
@@ -814,6 +1187,7 @@
 
     if (!question) {
       renderReflectionScreen();
+
       return;
     }
 
@@ -852,9 +1226,7 @@
                 <input
                   type="radio"
                   name="answer"
-                  value="${
-                    choice.value
-                  }"
+                  value="${choice.value}"
                   ${
                     checked
                       ? "checked"
@@ -895,9 +1267,7 @@
           1
         }
         of
-        ${
-          data.questions.length
-        }
+        ${data.questions.length}
       </div>
 
 
@@ -1035,6 +1405,7 @@
         "click",
         () => {
           goBackFromQuestion();
+
           scrollToCard();
         }
       );
@@ -1058,6 +1429,7 @@
           }
 
           goForwardFromQuestion();
+
           scrollToCard();
         }
       );
@@ -1074,10 +1446,12 @@
           ];
 
           goForwardFromQuestion();
+
           scrollToCard();
         }
       );
   }
+
 
   function goBackFromQuestion() {
     if (
@@ -1085,6 +1459,7 @@
       0
     ) {
       renderNameScreen();
+
       return;
     }
 
@@ -1093,6 +1468,7 @@
 
     renderQuestion();
   }
+
 
   function goForwardFromQuestion() {
     if (
@@ -1104,11 +1480,13 @@
         1;
 
       renderQuestion();
+
       return;
     }
 
     renderReflectionScreen();
   }
+
 
   /* ==========================================================
      REFLECTION
@@ -1257,6 +1635,7 @@
             1;
 
           renderQuestion();
+
           scrollToCard();
         }
       );
@@ -1269,11 +1648,14 @@
         "click",
         () => {
           saveReflectionValues();
+
           renderResultsScreen();
+
           scrollToCard();
         }
       );
   }
+
 
   function saveReflectionValues() {
     state.reflectionEnjoy =
@@ -1294,6 +1676,7 @@
         .trim() ||
       "";
   }
+
 
   /* ==========================================================
      SCORING
@@ -1354,7 +1737,8 @@
         let score = null;
 
         if (
-          answered > 0
+          answered >
+          0
         ) {
           const completeness =
             config.completenessBase +
@@ -1392,6 +1776,7 @@
     );
   }
 
+
   function getMaximumPossibleScore() {
     const highestAnswer =
       Math.max(
@@ -1409,6 +1794,7 @@
     );
   }
 
+
   function getVisualScorePercent(
     score
   ) {
@@ -1424,7 +1810,8 @@
       getMaximumPossibleScore();
 
     if (
-      maximum <= 0
+      maximum <=
+      0
     ) {
       return 0;
     }
@@ -1441,6 +1828,7 @@
       )
     );
   }
+
 
   /* ==========================================================
      FAMILY ANALYSIS
@@ -1513,6 +1901,7 @@
       );
   }
 
+
   function getHighestSignals(
     scores
   ) {
@@ -1558,6 +1947,7 @@
           1e-12
       );
   }
+
 
   /* ==========================================================
      RANKING
@@ -1625,6 +2015,7 @@
       );
   }
 
+
   /* ==========================================================
      NARRATIVE LOGIC
   ========================================================== */
@@ -1642,6 +2033,7 @@
       null
     );
   }
+
 
   function chooseBestCluster(
     standoutSignals,
@@ -1723,10 +2115,84 @@
     return candidates[0];
   }
 
+
+  function getLearningNarrativeBudget({
+    topSignalItems,
+    integrativeSummary,
+    nextStep,
+    fluidityNote,
+    qualitativeText,
+    standoutSignals
+  }) {
+    const standoutWords =
+      topSignalItems.reduce(
+        (
+          sum,
+          item
+        ) =>
+          sum +
+          countWords(
+            item.text
+          ),
+        0
+      );
+
+    const qualitativeWords =
+      countWords(
+        qualitativeText
+      );
+
+    const baseWords =
+      standoutWords +
+      countWords(
+        integrativeSummary
+      ) +
+      countWords(
+        nextStep
+      ) +
+      countWords(
+        fluidityNote
+      ) +
+      qualitativeWords;
+
+    if (
+      baseWords >
+        310 ||
+      qualitativeWords >
+        120 ||
+      (
+        standoutSignals.length >=
+          5 &&
+        baseWords >
+          250
+      )
+    ) {
+      return PROFILE_RULES
+        .learnBestTightWords;
+    }
+
+    if (
+      baseWords >
+        225 ||
+      qualitativeWords >
+        70 ||
+      standoutSignals.length >=
+        5
+    ) {
+      return PROFILE_RULES
+        .learnBestMediumWords;
+    }
+
+    return PROFILE_RULES
+      .learnBestRoomyWords;
+  }
+
+
   function buildLearnBestNarrative({
     standoutSignals,
     scores,
-    allTied
+    allTied,
+    maxWords
   }) {
     const familySummaries =
       getFamilySummaries(
@@ -1760,8 +2226,7 @@
 
       return composeNarrative(
         parts,
-        PROFILE_RULES
-          .learnBestMaxWords
+        maxWords
       );
     }
 
@@ -1799,30 +2264,62 @@
           : []
       );
 
-    const remainingStandouts =
-      standoutSignals.filter(
+    /*
+     * Add standout-signal observations.
+     *
+     * We intentionally stay strength-based here.
+     * A merely "lowest" score is not automatically
+     * interpreted as a learning limitation.
+     */
+    standoutSignals
+      .filter(
         (signalName) =>
           !clusterSignals.has(
             signalName
           )
+      )
+      .forEach(
+        (
+          signalName,
+          index
+        ) => {
+          const slug =
+            toSignalSlug(
+              signalName
+            );
+
+          const text =
+            pickNarrativeVariant(
+              `micro_${slug}_high`,
+              `learn-best-${index}`
+            );
+
+          if (text) {
+            parts.push(
+              text
+            );
+          }
+        }
       );
 
-    const highSignalsToAdd =
-      cluster
-        ? remainingStandouts.slice(
-            0,
-            1
+    /*
+     * If every standout signal was already represented
+     * by a cluster, add one of them back as a short
+     * individualized observation when space allows.
+     */
+    if (
+      cluster &&
+      standoutSignals.every(
+        (signalName) =>
+          clusterSignals.has(
+            signalName
           )
-        : standoutSignals.slice(
-            0,
-            2
-          );
+      )
+    ) {
+      const signalName =
+        standoutSignals[0];
 
-    highSignalsToAdd.forEach(
-      (
-        signalName,
-        index
-      ) => {
+      if (signalName) {
         const slug =
           toSignalSlug(
             signalName
@@ -1831,7 +2328,7 @@
         const text =
           pickNarrativeVariant(
             `micro_${slug}_high`,
-            `learn-best-${index}`
+            "learn-best-cluster-extra"
           );
 
         if (text) {
@@ -1840,14 +2337,14 @@
           );
         }
       }
-    );
+    }
 
     return composeNarrative(
       parts,
-      PROFILE_RULES
-        .learnBestMaxWords
+      maxWords
     );
   }
+
 
   function buildFamilyAwareIntegrativeSummary({
     scores,
@@ -1907,7 +2404,7 @@
     if (
       !allTied &&
       strongestSignals.length >
-        0
+      0
     ) {
       if (
         strongestSignals.length ===
@@ -1944,7 +2441,7 @@
     if (
       organization &&
       familySummaries.length >=
-        3
+      3
     ) {
       const distanceFromTop =
         strongestFamily.average -
@@ -1978,6 +2475,7 @@
         .integrativeMaxWords
     );
   }
+
 
   function buildNextStep(
     scores,
@@ -2051,6 +2549,7 @@
     );
   }
 
+
   function buildTopSignalItems(
     standoutSignals
   ) {
@@ -2100,6 +2599,7 @@
     );
   }
 
+
   /* ==========================================================
      LEGACY INTEGRATIVE FALLBACK
   ========================================================== */
@@ -2146,7 +2646,8 @@
 
     const min =
       sorted[
-        sorted.length - 1
+        sorted.length -
+        1
       ];
 
     const range =
@@ -2182,6 +2683,7 @@
       "integrative_broad_explorer_with_peaks"
     );
   }
+
 
   function buildLegacyIntegrativeSummary(
     scores
@@ -2234,6 +2736,7 @@
 
     return "";
   }
+
 
   /* ==========================================================
      QUALITATIVE RESPONSES
@@ -2292,6 +2795,7 @@
     return text;
   }
 
+
   function isNonAnswerQualitative(
     normalized
   ) {
@@ -2337,6 +2841,7 @@
     return false;
   }
 
+
   function isMeaningfulQualitative(
     value
   ) {
@@ -2367,6 +2872,7 @@
         .meaningfulReflectionMinWords
     );
   }
+
 
   function buildQualitativeText() {
     const blocks = [];
@@ -2399,6 +2905,7 @@
       " — "
     );
   }
+
 
   /* ==========================================================
      PROFILE MODEL
@@ -2454,7 +2961,8 @@
           pickNarrativeVariant(
             "profile_fluidity_note",
             "fluidity"
-          ) || "",
+          ) ||
+          "",
 
         qualitativeText:
           buildQualitativeText()
@@ -2597,13 +3105,6 @@
         standoutSignals
       );
 
-    const learnBest =
-      buildLearnBestNarrative({
-        standoutSignals,
-        scores,
-        allTied
-      });
-
     const integrativeSummary =
       buildFamilyAwareIntegrativeSummary({
         scores,
@@ -2623,6 +3124,28 @@
       ) ||
       "";
 
+    const qualitativeText =
+      buildQualitativeText();
+
+    const learnBestMaxWords =
+      getLearningNarrativeBudget({
+        topSignalItems,
+        integrativeSummary,
+        nextStep,
+        fluidityNote,
+        qualitativeText,
+        standoutSignals
+      });
+
+    const learnBest =
+      buildLearnBestNarrative({
+        standoutSignals,
+        scores,
+        allTied,
+        maxWords:
+          learnBestMaxWords
+      });
+
     return {
       scores,
       scoredSignals,
@@ -2639,15 +3162,17 @@
       topSignalItems,
 
       learnBest,
+      learnBestMaxWords,
+
       integrativeSummary,
       nextStep,
 
       fluidityNote,
 
-      qualitativeText:
-        buildQualitativeText()
+      qualitativeText
     };
   }
+
 
   /* ==========================================================
      PRINT DENSITY
@@ -2693,13 +3218,17 @@
       qualitativeWords;
 
     if (
-      totalWords > 390 ||
-      qualitativeWords > 120 ||
+      totalWords >
+        390 ||
+      qualitativeWords >
+        120 ||
       (
         profile
           .standoutSignals
-          .length >= 5 &&
-        totalWords > 330
+          .length >=
+          5 &&
+        totalWords >
+          330
       )
     ) {
       return (
@@ -2708,11 +3237,14 @@
     }
 
     if (
-      totalWords > 300 ||
-      qualitativeWords > 70 ||
+      totalWords >
+        300 ||
+      qualitativeWords >
+        70 ||
       profile
         .standoutSignals
-        .length >= 5
+        .length >=
+        5
     ) {
       return (
         "print-density-medium"
@@ -2723,6 +3255,7 @@
       "print-density-roomy"
     );
   }
+
 
   /* ==========================================================
      DISPLAY HELPERS
@@ -2740,7 +3273,8 @@
     }
 
     const value =
-      score * 100;
+      score *
+      100;
 
     const roundedInteger =
       Math.round(
@@ -2763,6 +3297,7 @@
       `${value.toFixed(1)}%`
     );
   }
+
 
   function formatGeneratedDate(
     date
@@ -2788,6 +3323,7 @@
     );
   }
 
+
   function getProfileTitle() {
     if (!state.name) {
       return (
@@ -2807,11 +3343,13 @@
     );
   }
 
+
   function familyCssSlug(
     family
   ) {
     return String(
-      family || ""
+      family ||
+      ""
     )
       .toLowerCase()
       .replace(
@@ -2820,6 +3358,7 @@
       );
   }
 
+
   /* ==========================================================
      RADAR MAP
   ========================================================== */
@@ -2827,18 +3366,23 @@
   function buildRadarSvg(
     profile
   ) {
-    const width = 540;
-    const height = 470;
+    const width =
+      540;
 
-    const centerX = 270;
-    const centerY = 210;
+    const height =
+      470;
 
-    /*
-     * Larger inner geometry while preserving
-     * the original 0..1 radar scale.
-     */
-    const radius = 165;
-    const labelRadius = 203;
+    const centerX =
+      270;
+
+    const centerY =
+      210;
+
+    const radius =
+      165;
+
+    const labelRadius =
+      203;
 
     const scoreMap =
       new Map(
@@ -2877,16 +3421,17 @@
           Math.cos(
             angle
           ) *
-            distance,
+          distance,
 
         y:
           centerY +
           Math.sin(
             angle
           ) *
-            distance
+          distance
       };
     }
+
 
     function pointsForSignalNames(
       signalNames
@@ -2905,7 +3450,8 @@
               );
 
             if (
-              index < 0 ||
+              index <
+                0 ||
               !Number.isFinite(
                 score
               )
@@ -2917,7 +3463,7 @@
               polarPoint(
                 index,
                 radius *
-                  score
+                score
               );
 
             return {
@@ -2928,6 +3474,7 @@
         )
         .filter(Boolean);
     }
+
 
     function pathForPoints(
       points,
@@ -2955,7 +3502,7 @@
       for (
         let index = 1;
         index <
-        points.length;
+          points.length;
         index += 1
       ) {
         commands.push(
@@ -2973,7 +3520,8 @@
 
       if (
         closePath &&
-        points.length >= 3
+        points.length >=
+          3
       ) {
         commands.push(
           "Z"
@@ -2984,6 +3532,7 @@
         " "
       );
     }
+
 
     const organizationScore =
       scoreMap.get(
@@ -3007,7 +3556,7 @@
             polarPoint(
               index,
               radius *
-                organizationScore
+              organizationScore
             )
         );
 
@@ -3024,6 +3573,7 @@
       `;
     }
 
+
     const familyClass = {
       Thinking:
         "radar-thinking",
@@ -3034,6 +3584,7 @@
       Helping:
         "radar-helping"
     };
+
 
     const familyPaths =
       Object.entries(
@@ -3129,6 +3680,7 @@
         )
         .join("");
 
+
     const labels =
       RADAR_ORDER
         .map(
@@ -3150,14 +3702,16 @@
               "middle";
 
             if (
-              deltaX > 38
+              deltaX >
+              38
             ) {
               anchor =
                 "start";
             }
 
             if (
-              deltaX < -38
+              deltaX <
+              -38
             ) {
               anchor =
                 "end";
@@ -3197,12 +3751,14 @@
         )
         .join("");
 
+
     const organizationLegendClass =
       standoutSet.has(
         "Organization"
       )
         ? " legend-label-top"
         : "";
+
 
     return `
       <svg
@@ -3301,6 +3857,7 @@
     `;
   }
 
+
   /* ==========================================================
      PAGE 2 SCORE / METHODOLOGY MARKUP
   ========================================================== */
@@ -3398,6 +3955,7 @@
     `;
   }
 
+
   function buildScoreGroupsMarkup(
     profile
   ) {
@@ -3446,56 +4004,75 @@
       .join("");
   }
 
+
   function buildMethodologyMarkup() {
     const lensCards =
       QUESTION_LENSES
         .map(
-          (lens) => `
-            <article class="methodology-lens">
+          (
+            lens,
+            index
+          ) => {
+            const isLast =
+              index ===
+              QUESTION_LENSES.length -
+              1;
 
-              <h4>
-                ${escapeHtml(
-                  lens.title
-                )}
-              </h4>
+            return `
+              <article
+                class="methodology-lens ${
+                  isLast
+                    ? "methodology-lens-wide"
+                    : ""
+                }"
+              >
 
-              <p>
-                ${escapeHtml(
-                  lens.description
-                )}
-              </p>
+                <h4>
+                  ${escapeHtml(
+                    lens.title
+                  )}
+                </h4>
 
-              <p class="methodology-map">
-                <strong>
-                  Signals:
-                </strong>
+                <p>
+                  ${escapeHtml(
+                    lens.description
+                  )}
+                </p>
 
-                ${escapeHtml(
-                  lens.signals.join(
-                    " · "
-                  )
-                )}
+                <p class="methodology-map">
 
-                <br>
+                  <strong>
+                    Signals:
+                  </strong>
 
-                <strong>
-                  ${
-                    lens.families.length ===
-                    1
-                      ? "Family"
-                      : "Families"
-                  }:
-                </strong>
+                  ${escapeHtml(
+                    lens.signals.join(
+                      " · "
+                    )
+                  )}
 
-                ${escapeHtml(
-                  lens.families.join(
-                    " + "
-                  )
-                )}
-              </p>
+                  <br>
 
-            </article>
-          `
+                  <strong>
+                    ${
+                      lens.families.length ===
+                      1
+                        ? "Family"
+                        : "Families"
+                    }:
+                  </strong>
+
+                  ${escapeHtml(
+                    lens.families.join(
+                      " + "
+                    )
+                  )}
+
+                </p>
+
+              </article>
+            `;
+          }
         )
         .join("");
 
@@ -3507,23 +4084,19 @@
         </h3>
 
         <p class="methodology-intro">
-          The 50 questions were designed around five broad
-          ways of exploring interests, learning, problem-solving,
-          helping, and organization. The questions are mixed into
-          a balanced random order each time a new Explorer Profile
-          begins, but every question still contributes only to its
-          assigned Explorer Signal.
-        </p>
-
-        <p class="methodology-intro">
-          Each of the 10 Explorer Signals is based on five questions.
-          Those signals are grouped into four larger families:
+          The 50 questions explore five broad areas of interests,
+          learning, problem-solving, helping, and organization.
+          They appear in a balanced random order each time a new
+          Explorer Profile begins, while every question still
+          contributes only to its assigned Explorer Signal.
+          Each of the 10 signals is based on five questions and
+          belongs to one of four larger families:
           <strong>Thinking</strong>,
           <strong>Action</strong>,
-          <strong>Helping</strong>, and
+          <strong>Helping</strong>, or
           <strong>Organization</strong>.
-          The five lenses below guided the question design; they
-          intentionally overlap across the four result families.
+          The five lenses below guided the question design and
+          intentionally overlap across those families.
         </p>
 
         <div class="methodology-grid">
@@ -3533,6 +4106,7 @@
       </section>
     `;
   }
+
 
   /* ==========================================================
      RESULTS
@@ -3603,6 +4177,7 @@
               1;
 
             renderQuestion();
+
             scrollToCard();
           }
         );
@@ -3615,6 +4190,7 @@
           "click",
           () => {
             resetApp();
+
             scrollToCard();
           }
         );
@@ -4017,6 +4593,7 @@
         "click",
         () => {
           renderReflectionScreen();
+
           scrollToCard();
         }
       );
@@ -4038,10 +4615,12 @@
         "click",
         () => {
           resetApp();
+
           scrollToCard();
         }
       );
   }
+
 
   /* ==========================================================
      RESET
@@ -4068,6 +4647,7 @@
 
     renderWelcome();
   }
+
 
   /* ==========================================================
      START
