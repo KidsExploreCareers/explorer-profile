@@ -21,16 +21,12 @@
   const PROFILE_RULES = {
     topThreshold: 0.05,
     bottomThreshold: 0.05,
-
     reportMinTopSignals: 3,
     reportMaxTopSignals: 5,
-
     integrativeEvenRangeMax: 0.18,
     integrativePeakGapMin: 0.14,
     integrativeStrongPeakMin: 0.78,
-
     meaningfulReflectionMinWords: 2,
-
     learnBestMaxWords: 95,
     integrativeMaxWords: 95
   };
@@ -45,13 +41,10 @@
   const FAMILY_DESCRIPTORS = {
     Thinking:
       "wondering, making connections, imagining possibilities, and reflecting on ideas",
-
     Action:
       "getting started, sticking with challenges, experimenting, and learning by doing",
-
     Helping:
       "explaining, supporting, collaborating, and working with other people",
-
     Organization:
       "planning, creating structure, and knowing what comes next"
   };
@@ -59,13 +52,10 @@
   const FAMILY_LEARNING_TEXT = {
     Thinking:
       "You may learn especially well when there is time to wonder, make connections, explore possibilities, and think ideas through before moving on.",
-
     Action:
       "You may learn especially well when you can take a first step, try something for yourself, and improve it as you go.",
-
     Helping:
       "You may learn especially well when you can talk ideas through, support someone else, or work toward a goal with other people.",
-
     Organization:
       "You may learn especially well when expectations are clear, there is a plan to follow, and you know what comes next."
   };
@@ -83,23 +73,9 @@
   ];
 
   const RADAR_FAMILIES = {
-    Thinking: [
-      "Curiosity",
-      "Creativity",
-      "Reflection"
-    ],
-
-    Action: [
-      "Initiative",
-      "Persistence",
-      "Reasoning"
-    ],
-
-    Helping: [
-      "Instruction",
-      "Empathy",
-      "Collaboration"
-    ]
+    Thinking: ["Curiosity", "Creativity", "Reflection"],
+    Action: ["Initiative", "Persistence", "Reasoning"],
+    Helping: ["Instruction", "Empathy", "Collaboration"]
   };
 
   const QUESTION_LENSES = [
@@ -107,128 +83,68 @@
       title: "What I Enjoy and Wonder About",
       description:
         "These questions are about what you enjoy, what interests you, and what naturally grabs your attention.",
-      signals: [
-        "Curiosity",
-        "Creativity"
-      ],
-      families: [
-        "Thinking"
-      ]
+      signals: ["Curiosity", "Creativity"],
+      families: ["Thinking"]
     },
-
     {
       title: "How I Like to Think",
       description:
         "These questions are about how you think about ideas, choices, and experiences.",
-      signals: [
-        "Reflection"
-      ],
-      families: [
-        "Thinking"
-      ]
+      signals: ["Reflection"],
+      families: ["Thinking"]
     },
-
     {
       title: "How I Start and Keep Going",
       description:
         "These questions are about how you begin things, stick with them, and grow while working on something over time.",
-      signals: [
-        "Initiative",
-        "Persistence"
-      ],
-      families: [
-        "Action"
-      ]
+      signals: ["Initiative", "Persistence"],
+      families: ["Action"]
     },
-
     {
       title: "How I Solve Problems and Help",
       description:
         "These questions are about how you approach problems, help others, and work on things that matter.",
-      signals: [
-        "Reasoning",
-        "Instruction"
-      ],
-      families: [
-        "Action",
-        "Helping"
-      ]
+      signals: ["Reasoning", "Instruction"],
+      families: ["Action", "Helping"]
     },
-
     {
       title: "How I Work With Others and Stay Organized",
       description:
         "These questions are about how you like to work with people, follow routines, and keep things organized.",
-      signals: [
-        "Empathy",
-        "Collaboration",
-        "Organization"
-      ],
-      families: [
-        "Helping",
-        "Organization"
-      ]
+      signals: ["Empathy", "Collaboration", "Organization"],
+      families: ["Helping", "Organization"]
     }
   ];
 
   const CLUSTER_RULES = [
     {
       key: "cluster_curiosity_creativity",
-      signals: [
-        "Curiosity",
-        "Creativity"
-      ]
+      signals: ["Curiosity", "Creativity"]
     },
-
     {
       key: "cluster_curiosity_reasoning",
-      signals: [
-        "Curiosity",
-        "Reasoning"
-      ]
+      signals: ["Curiosity", "Reasoning"]
     },
-
     {
       key: "cluster_persistence_organization",
-      signals: [
-        "Persistence",
-        "Organization"
-      ]
+      signals: ["Persistence", "Organization"]
     },
-
     {
       key: "cluster_empathy_instruction",
-      signals: [
-        "Empathy",
-        "Instruction"
-      ]
+      signals: ["Empathy", "Instruction"]
     },
-
     {
       key: "cluster_collaboration_empathy",
-      signals: [
-        "Collaboration",
-        "Empathy"
-      ]
+      signals: ["Collaboration", "Empathy"]
     }
   ];
 
   const QUESTION_BY_ID = new Map(
-    data.questions.map(
-      (question) => [
-        question.id,
-        question
-      ]
-    )
+    data.questions.map((question) => [question.id, question])
   );
 
   const SIGNAL_FAMILY = new Map(
-    data.signals.map(
-      (signal) => [
-        signal.name,
-        signal.family
-      ]
-    )
+    data.signals.map((signal) => [signal.name, signal.family])
   );
 
   const state = {
@@ -240,23 +156,15 @@
     reflectionSurprise: ""
   };
 
-  const appCard =
-    document.getElementById(
-      "app-card"
-    );
-
-  let scoreDetailsOpenBeforePrint =
-    null;
-
+  const appCard = document.getElementById("app-card");
+  let scoreDetailsOpenBeforePrint = null;
 
   /* ==========================================================
      GENERAL HELPERS
   ========================================================== */
 
   function escapeHtml(value) {
-    return String(
-      value ?? ""
-    )
+    return String(value ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
@@ -264,138 +172,57 @@
       .replaceAll("'", "&#039;");
   }
 
-
   function toSignalSlug(signalName) {
-    return String(
-      signalName || ""
-    )
+    return String(signalName || "")
       .trim()
       .toLowerCase()
       .replaceAll("&", "and")
-      .replace(
-        /[^a-z0-9]+/g,
-        "_"
-      )
-      .replace(
-        /^_+|_+$/g,
-        ""
-      );
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
   }
-
 
   function ensureSentence(value) {
-    const text =
-      String(
-        value || ""
-      ).trim();
-
-    if (!text) {
-      return "";
-    }
-
-    return /[.!?]$/.test(text)
-      ? text
-      : `${text}.`;
+    const text = String(value || "").trim();
+    if (!text) return "";
+    return /[.!?]$/.test(text) ? text : `${text}.`;
   }
-
 
   function countWords(value) {
-    const text =
-      String(
-        value || ""
-      ).trim();
-
-    if (!text) {
-      return 0;
-    }
-
-    return text
-      .split(/\s+/)
-      .filter(Boolean)
-      .length;
+    const text = String(value || "").trim();
+    if (!text) return 0;
+    return text.split(/\s+/).filter(Boolean).length;
   }
 
+  function truncateToWords(value, maxWords) {
+    const text = String(value || "").trim();
+    const words = text.split(/\s+/).filter(Boolean);
 
-  function truncateToWords(
-    value,
-    maxWords
-  ) {
-    const text =
-      String(
-        value || ""
-      ).trim();
-
-    const words =
-      text
-        .split(/\s+/)
-        .filter(Boolean);
-
-    if (
-      words.length <= maxWords
-    ) {
-      return text;
-    }
+    if (words.length <= maxWords) return text;
 
     return (
       words
-        .slice(
-          0,
-          maxWords
-        )
+        .slice(0, maxWords)
         .join(" ")
-        .replace(
-          /[,;:–—-]+$/,
-          ""
-        ) +
-      "…"
+        .replace(/[,;:–—-]+$/, "") + "…"
     );
   }
 
+  function composeNarrative(parts, maxWords) {
+    const cleaned = parts.map(ensureSentence).filter(Boolean);
 
-  function composeNarrative(
-    parts,
-    maxWords
-  ) {
-    const cleaned =
-      parts
-        .map(
-          (part) =>
-            ensureSentence(part)
-        )
-        .filter(Boolean);
-
-    if (
-      cleaned.length === 0
-    ) {
-      return "";
-    }
+    if (cleaned.length === 0) return "";
 
     const result = [];
     let usedWords = 0;
 
-    for (
-      const part
-      of cleaned
-    ) {
-      const words =
-        countWords(part);
+    for (const part of cleaned) {
+      const words = countWords(part);
 
-      if (
-        result.length === 0 &&
-        words > maxWords
-      ) {
-        return truncateToWords(
-          part,
-          maxWords
-        );
+      if (result.length === 0 && words > maxWords) {
+        return truncateToWords(part, maxWords);
       }
 
-      if (
-        usedWords + words >
-        maxWords
-      ) {
-        continue;
-      }
+      if (usedWords + words > maxWords) continue;
 
       result.push(part);
       usedWords += words;
@@ -404,78 +231,41 @@
     return result.join(" ");
   }
 
-
   function hashString(value) {
-    const text =
-      String(
-        value || ""
-      );
-
+    const text = String(value || "");
     let hash = 0;
 
-    for (
-      let i = 0;
-      i < text.length;
-      i += 1
-    ) {
-      hash =
-        ((hash << 5) - hash) +
-        text.charCodeAt(i);
-
+    for (let i = 0; i < text.length; i += 1) {
+      hash = ((hash << 5) - hash) + text.charCodeAt(i);
       hash |= 0;
     }
 
     return hash;
   }
 
-
   function getProfileSeed() {
     return data.questions
-      .map(
-        (question) => {
-          const value =
-            state.answers[
-              question.id
-            ];
+      .map((question) => {
+        const value = state.answers[question.id];
 
-          return value === undefined
-            ? `${question.id}:_`
-            : `${question.id}:${value}`;
-        }
-      )
+        return value === undefined
+          ? `${question.id}:_`
+          : `${question.id}:${value}`;
+      })
       .join("|");
   }
 
+  function pickNarrativeVariant(key, seedSuffix = "") {
+    const value = narratives[key];
 
-  function pickNarrativeVariant(
-    key,
-    seedSuffix = ""
-  ) {
-    const value =
-      narratives[key];
+    if (!value) return null;
+    if (typeof value === "string") return value;
 
-    if (!value) {
-      return null;
-    }
-
-    if (
-      typeof value === "string"
-    ) {
-      return value;
-    }
-
-    const seed =
-      `${key}::${getProfileSeed()}::${seedSuffix}`;
-
-    const index =
-      Math.abs(
-        hashString(seed)
-      ) %
-      value.length;
+    const seed = `${key}::${getProfileSeed()}::${seedSuffix}`;
+    const index = Math.abs(hashString(seed)) % value.length;
 
     return value[index];
   }
-
 
   function scrollToCard() {
     appCard.scrollIntoView({
@@ -484,7 +274,6 @@
     });
   }
 
-
   /* ==========================================================
      LOCAL RANDOMIZATION
   ========================================================== */
@@ -492,61 +281,38 @@
   function randomUnit() {
     if (
       window.crypto &&
-      typeof window.crypto
-        .getRandomValues ===
-        "function"
+      typeof window.crypto.getRandomValues === "function"
     ) {
-      const array =
-        new Uint32Array(1);
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
 
-      window.crypto
-        .getRandomValues(
-          array
-        );
-
-      return (
-        array[0] /
-        4294967296
-      );
+      return array[0] / 4294967296;
     }
 
     return Math.random();
   }
 
-
   function randomChoice(items) {
-    if (
-      !items ||
-      items.length === 0
-    ) {
-      return null;
-    }
+    if (!items || items.length === 0) return null;
 
-    const index =
-      Math.floor(
-        randomUnit() *
-        items.length
-      );
+    const index = Math.floor(
+      randomUnit() * items.length
+    );
 
     return items[index];
   }
 
-
   function shuffledCopy(items) {
-    const result =
-      [...items];
+    const result = [...items];
 
     for (
-      let i =
-        result.length - 1;
+      let i = result.length - 1;
       i > 0;
       i -= 1
     ) {
-      const j =
-        Math.floor(
-          randomUnit() *
-          (i + 1)
-        );
+      const j = Math.floor(
+        randomUnit() * (i + 1)
+      );
 
       [
         result[i],
@@ -560,47 +326,32 @@
     return result;
   }
 
-
-  /*
-   * Balanced randomization:
-   * each round contains one question
-   * from each of the 10 Explorer Signals.
-   */
   function buildBalancedQuestionOrder() {
-    const bySignal =
-      new Map();
+    const bySignal = new Map();
 
-    data.signals.forEach(
-      (signal) => {
+    data.signals.forEach((signal) => {
+      bySignal.set(
+        signal.name,
+        []
+      );
+    });
+
+    data.questions.forEach((question) => {
+      if (
+        !bySignal.has(
+          question.signal
+        )
+      ) {
         bySignal.set(
-          signal.name,
+          question.signal,
           []
         );
       }
-    );
 
-    data.questions.forEach(
-      (question) => {
-        if (
-          !bySignal.has(
-            question.signal
-          )
-        ) {
-          bySignal.set(
-            question.signal,
-            []
-          );
-        }
-
-        bySignal
-          .get(
-            question.signal
-          )
-          .push(
-            question
-          );
-      }
-    );
+      bySignal
+        .get(question.signal)
+        .push(question);
+    });
 
     for (
       const [
@@ -611,9 +362,7 @@
     ) {
       bySignal.set(
         signalName,
-        shuffledCopy(
-          questions
-        )
+        shuffledCopy(questions)
       );
     }
 
@@ -627,8 +376,7 @@
         )
       );
 
-    const orderedQuestions =
-      [];
+    const orderedQuestions = [];
 
     for (
       let round = 0;
@@ -642,31 +390,25 @@
           ).filter(
             (signalName) =>
               bySignal
-                .get(
-                  signalName
-                )[round]
+                .get(signalName)[round]
           )
         );
 
       while (
-        remainingSignals.length >
-        0
+        remainingSignals.length > 0
       ) {
         const previousQuestion =
           orderedQuestions[
-            orderedQuestions.length -
-            1
+            orderedQuestions.length - 1
           ];
 
         const secondPreviousQuestion =
           orderedQuestions[
-            orderedQuestions.length -
-            2
+            orderedQuestions.length - 2
           ];
 
         const previousSignal =
-          previousQuestion
-            ?.signal;
+          previousQuestion?.signal;
 
         const previousFamily =
           previousQuestion
@@ -728,9 +470,7 @@
         }
 
         const recentQuestions =
-          orderedQuestions.slice(
-            -5
-          );
+          orderedQuestions.slice(-5);
 
         const recentFamilyCounts =
           new Map();
@@ -796,9 +536,7 @@
 
         const chosenQuestion =
           bySignal
-            .get(
-              chosenSignal
-            )[round];
+            .get(chosenSignal)[round];
 
         orderedQuestions.push(
           chosenQuestion
@@ -819,7 +557,6 @@
     );
   }
 
-
   function ensureQuestionOrder() {
     if (
       state.questionOrder.length ===
@@ -831,7 +568,6 @@
     state.questionOrder =
       buildBalancedQuestionOrder();
   }
-
 
   function getCurrentQuestion() {
     ensureQuestionOrder();
@@ -848,7 +584,6 @@
     );
   }
 
-
   /* ==========================================================
      PRINTING
   ========================================================== */
@@ -859,9 +594,7 @@
         ".score-details"
       );
 
-    if (!details) {
-      return;
-    }
+    if (!details) return;
 
     if (
       scoreDetailsOpenBeforePrint ===
@@ -873,7 +606,6 @@
 
     details.open = true;
   }
-
 
   function restoreAfterPrint() {
     const details =
@@ -894,30 +626,24 @@
       null;
   }
 
-
   function printProfile() {
     prepareForPrint();
 
     window.setTimeout(
-      () => {
-        window.print();
-      },
+      () => window.print(),
       0
     );
   }
-
 
   window.addEventListener(
     "beforeprint",
     prepareForPrint
   );
 
-
   window.addEventListener(
     "afterprint",
     restoreAfterPrint
   );
-
 
   /* ==========================================================
      WELCOME
@@ -979,7 +705,6 @@
         }
       );
   }
-
 
   /* ==========================================================
      NAME
@@ -1078,7 +803,6 @@
         }
       );
   }
-
 
   /* ==========================================================
      QUESTIONS
@@ -1355,7 +1079,6 @@
       );
   }
 
-
   function goBackFromQuestion() {
     if (
       state.currentQuestionIndex ===
@@ -1370,7 +1093,6 @@
 
     renderQuestion();
   }
-
 
   function goForwardFromQuestion() {
     if (
@@ -1387,7 +1109,6 @@
 
     renderReflectionScreen();
   }
-
 
   /* ==========================================================
      REFLECTION
@@ -1554,7 +1275,6 @@
       );
   }
 
-
   function saveReflectionValues() {
     state.reflectionEnjoy =
       document
@@ -1574,7 +1294,6 @@
         .trim() ||
       "";
   }
-
 
   /* ==========================================================
      SCORING
@@ -1673,7 +1392,6 @@
     );
   }
 
-
   function getMaximumPossibleScore() {
     const highestAnswer =
       Math.max(
@@ -1690,7 +1408,6 @@
       data.scoring.scaleDivisor
     );
   }
-
 
   function getVisualScorePercent(
     score
@@ -1724,7 +1441,6 @@
       )
     );
   }
-
 
   /* ==========================================================
      FAMILY ANALYSIS
@@ -1797,7 +1513,6 @@
       );
   }
 
-
   function getHighestSignals(
     scores
   ) {
@@ -1843,7 +1558,6 @@
           1e-12
       );
   }
-
 
   /* ==========================================================
      RANKING
@@ -1911,7 +1625,6 @@
       );
   }
 
-
   /* ==========================================================
      NARRATIVE LOGIC
   ========================================================== */
@@ -1929,7 +1642,6 @@
       null
     );
   }
-
 
   function chooseBestCluster(
     standoutSignals,
@@ -2011,10 +1723,8 @@
     return candidates[0];
   }
 
-
   function buildLearnBestNarrative({
     standoutSignals,
-    bottomSignals,
     scores,
     allTied
   }) {
@@ -2069,44 +1779,6 @@
       );
     }
 
-    const clusterSignals =
-      new Set(
-        cluster
-          ? cluster.signals
-          : []
-      );
-
-    const highCandidates =
-      standoutSignals.filter(
-        (signalName) =>
-          !clusterSignals.has(
-            signalName
-          )
-      );
-
-    const firstHighSignal =
-      highCandidates[0] ||
-      standoutSignals[0];
-
-    if (firstHighSignal) {
-      const slug =
-        toSignalSlug(
-          firstHighSignal
-        );
-
-      const highText =
-        pickNarrativeVariant(
-          `micro_${slug}_high`,
-          "learn-best"
-        );
-
-      if (highText) {
-        parts.push(
-          highText
-        );
-      }
-    }
-
     if (
       strongestFamily &&
       FAMILY_LEARNING_TEXT[
@@ -2120,72 +1792,46 @@
       );
     }
 
-    /*
-     * A lower signal can add useful context
-     * without being framed as a weakness.
-     */
-    const bottomSignal =
-      bottomSignals.find(
-        (signalName) =>
-          !standoutSignals
-            .includes(
-              signalName
-            )
+    const clusterSignals =
+      new Set(
+        cluster
+          ? cluster.signals
+          : []
       );
 
-    if (
-      bottomSignal &&
-      countWords(
-        parts.join(" ")
-      ) <
-      72
-    ) {
-      const slug =
-        toSignalSlug(
-          bottomSignal
-        );
+    const remainingStandouts =
+      standoutSignals.filter(
+        (signalName) =>
+          !clusterSignals.has(
+            signalName
+          )
+      );
 
-      const lowText =
-        pickNarrativeVariant(
-          `micro_${slug}_low`,
-          "learn-best-low"
-        );
+    const highSignalsToAdd =
+      cluster
+        ? remainingStandouts.slice(
+            0,
+            1
+          )
+        : standoutSignals.slice(
+            0,
+            2
+          );
 
-      if (lowText) {
-        parts.push(
-          lowText
-        );
-      }
-    }
-
-    /*
-     * If there was no cluster, a second
-     * standout signal adds more depth.
-     */
-    if (
-      !cluster &&
-      countWords(
-        parts.join(" ")
-      ) <
-      65
-    ) {
-      const secondSignal =
-        standoutSignals.find(
-          (signalName) =>
-            signalName !==
-            firstHighSignal
-        );
-
-      if (secondSignal) {
+    highSignalsToAdd.forEach(
+      (
+        signalName,
+        index
+      ) => {
         const slug =
           toSignalSlug(
-            secondSignal
+            signalName
           );
 
         const text =
           pickNarrativeVariant(
             `micro_${slug}_high`,
-            "learn-best-second"
+            `learn-best-${index}`
           );
 
         if (text) {
@@ -2194,7 +1840,7 @@
           );
         }
       }
-    }
+    );
 
     return composeNarrative(
       parts,
@@ -2202,7 +1848,6 @@
         .learnBestMaxWords
     );
   }
-
 
   function buildFamilyAwareIntegrativeSummary({
     scores,
@@ -2247,7 +1892,8 @@
 
     if (
       allTied ||
-      familySpread <= 0.055
+      familySpread <=
+        0.055
     ) {
       parts.push(
         "Your four Explorer families are fairly close together right now. That suggests flexibility: you may be comfortable shifting between thinking, taking action, helping others, and using structure depending on what the situation calls for."
@@ -2260,10 +1906,12 @@
 
     if (
       !allTied &&
-      strongestSignals.length > 0
+      strongestSignals.length >
+        0
     ) {
       if (
-        strongestSignals.length === 1
+        strongestSignals.length ===
+        1
       ) {
         parts.push(
           `${strongestSignals[0].name} stands out most strongly among your individual signals, giving another clue about what feels especially natural or energizing to you right now.`
@@ -2271,7 +1919,10 @@
       } else {
         const names =
           strongestSignals
-            .slice(0, 3)
+            .slice(
+              0,
+              3
+            )
             .map(
               (signal) =>
                 signal.name
@@ -2292,7 +1943,8 @@
 
     if (
       organization &&
-      familySummaries.length >= 3
+      familySummaries.length >=
+        3
     ) {
       const distanceFromTop =
         strongestFamily.average -
@@ -2315,7 +1967,7 @@
           0.12
       ) {
         parts.push(
-          "Organization is less prominent in this snapshot, which may simply mean you prefer enough structure to get started without needing every detail planned in advance."
+          "Your answers suggest that flexibility may feel more natural than having every detail planned in advance. A simple structure can still help you get started while leaving room to adjust as you go."
         );
       }
     }
@@ -2326,7 +1978,6 @@
         .integrativeMaxWords
     );
   }
-
 
   function buildNextStep(
     scores,
@@ -2349,7 +2000,9 @@
 
     if (allTied) {
       return (
-        "Choose one question from this profile that caught your attention, and try a small activity connected to it. Notice what feels fun, interesting, or worth exploring again."
+        "Choose one question from this profile that caught your attention, " +
+        "and try a small activity connected to it. Notice what feels fun, " +
+        "interesting, or worth exploring again."
       );
     }
 
@@ -2397,7 +2050,6 @@
       ""
     );
   }
-
 
   function buildTopSignalItems(
     standoutSignals
@@ -2447,7 +2099,6 @@
       }
     );
   }
-
 
   /* ==========================================================
      LEGACY INTEGRATIVE FALLBACK
@@ -2532,7 +2183,6 @@
     );
   }
 
-
   function buildLegacyIntegrativeSummary(
     scores
   ) {
@@ -2584,7 +2234,6 @@
 
     return "";
   }
-
 
   /* ==========================================================
      QUALITATIVE RESPONSES
@@ -2643,7 +2292,6 @@
     return text;
   }
 
-
   function isNonAnswerQualitative(
     normalized
   ) {
@@ -2689,7 +2337,6 @@
     return false;
   }
 
-
   function isMeaningfulQualitative(
     value
   ) {
@@ -2720,7 +2367,6 @@
         .meaningfulReflectionMinWords
     );
   }
-
 
   function buildQualitativeText() {
     const blocks = [];
@@ -2753,7 +2399,6 @@
       " — "
     );
   }
-
 
   /* ==========================================================
      PROFILE MODEL
@@ -2955,7 +2600,6 @@
     const learnBest =
       buildLearnBestNarrative({
         standoutSignals,
-        bottomSignals,
         scores,
         allTied
       });
@@ -3005,7 +2649,6 @@
     };
   }
 
-
   /* ==========================================================
      PRINT DENSITY
   ========================================================== */
@@ -3014,7 +2657,8 @@
     profile
   ) {
     const standoutWords =
-      profile.topSignalItems
+      profile
+        .topSignalItems
         .reduce(
           (
             sum,
@@ -3080,7 +2724,6 @@
     );
   }
 
-
   /* ==========================================================
      DISPLAY HELPERS
   ========================================================== */
@@ -3121,7 +2764,6 @@
     );
   }
 
-
   function formatGeneratedDate(
     date
   ) {
@@ -3146,7 +2788,6 @@
     );
   }
 
-
   function getProfileTitle() {
     if (!state.name) {
       return (
@@ -3166,7 +2807,6 @@
     );
   }
 
-
   function familyCssSlug(
     family
   ) {
@@ -3179,7 +2819,6 @@
         "-"
       );
   }
-
 
   /* ==========================================================
      RADAR MAP
@@ -3195,10 +2834,11 @@
     const centerY = 210;
 
     /*
-     * Larger than the earlier version.
+     * Larger inner geometry while preserving
+     * the original 0..1 radar scale.
      */
-    const radius = 150;
-    const labelRadius = 190;
+    const radius = 165;
+    const labelRadius = 203;
 
     const scoreMap =
       new Map(
@@ -3248,7 +2888,6 @@
       };
     }
 
-
     function pointsForSignalNames(
       signalNames
     ) {
@@ -3290,13 +2929,13 @@
         .filter(Boolean);
     }
 
-
     function pathForPoints(
       points,
       closePath
     ) {
       if (
-        points.length === 0
+        points.length ===
+        0
       ) {
         return "";
       }
@@ -3346,7 +2985,6 @@
       );
     }
 
-
     const organizationScore =
       scoreMap.get(
         "Organization"
@@ -3386,7 +3024,6 @@
       `;
     }
 
-
     const familyClass = {
       Thinking:
         "radar-thinking",
@@ -3397,7 +3034,6 @@
       Helping:
         "radar-helping"
     };
-
 
     const familyPaths =
       Object.entries(
@@ -3493,7 +3129,6 @@
         )
         .join("");
 
-
     const labels =
       RADAR_ORDER
         .map(
@@ -3533,48 +3168,23 @@
                 signalName
               );
 
-            const topClass =
-              standout
-                ? " radar-label-top"
-                : "";
-
-            let starX =
-              point.x;
-
-            let starY =
-              point.y;
-
-            if (
-              anchor ===
-              "start"
-            ) {
-              starX -= 12;
-            } else if (
-              anchor ===
-              "end"
-            ) {
-              starX += 12;
-            } else {
-              starY -= 16;
+            if (standout) {
+              return `
+                <text
+                  class="radar-label radar-label-top"
+                  x="${point.x.toFixed(2)}"
+                  y="${point.y.toFixed(2)}"
+                  text-anchor="${anchor}"
+                  dominant-baseline="middle"
+                ><tspan class="radar-standout-star-inline">★ </tspan><tspan>${escapeHtml(
+                  signalName
+                )}</tspan></text>
+              `;
             }
 
             return `
-              ${
-                standout
-                  ? `
-                    <text
-                      class="radar-standout-star"
-                      x="${starX.toFixed(2)}"
-                      y="${starY.toFixed(2)}"
-                      text-anchor="middle"
-                      dominant-baseline="middle"
-                    >★</text>
-                  `
-                  : ""
-              }
-
               <text
-                class="radar-label${topClass}"
+                class="radar-label"
                 x="${point.x.toFixed(2)}"
                 y="${point.y.toFixed(2)}"
                 text-anchor="${anchor}"
@@ -3587,14 +3197,12 @@
         )
         .join("");
 
-
     const organizationLegendClass =
       standoutSet.has(
         "Organization"
       )
         ? " legend-label-top"
         : "";
-
 
     return `
       <svg
@@ -3693,7 +3301,6 @@
     `;
   }
 
-
   /* ==========================================================
      PAGE 2 SCORE / METHODOLOGY MARKUP
   ========================================================== */
@@ -3770,10 +3377,12 @@
           class="score-meter"
           aria-hidden="true"
         >
+
           <div
             class="score-meter-fill score-fill-${familySlug}"
             style="width: ${width}%"
           ></div>
+
         </div>
 
 
@@ -3788,7 +3397,6 @@
       </div>
     `;
   }
-
 
   function buildScoreGroupsMarkup(
     profile
@@ -3837,7 +3445,6 @@
       )
       .join("");
   }
-
 
   function buildMethodologyMarkup() {
     const lensCards =
@@ -3926,7 +3533,6 @@
       </section>
     `;
   }
-
 
   /* ==========================================================
      RESULTS
@@ -4043,7 +3649,9 @@
       0
         ? `
           <p class="radar-standout-note">
-            <span aria-hidden="true">★</span>
+            <span aria-hidden="true">
+              ★
+            </span>
             Standout signal
           </p>
         `
@@ -4084,6 +3692,7 @@
                       </span>
 
                       <span>
+
                         <strong>
                           ${escapeHtml(
                             item.label
@@ -4093,6 +3702,7 @@
                         ${escapeHtml(
                           item.text
                         )}
+
                       </span>
 
                     </li>
@@ -4313,11 +3923,9 @@
               A higher score means an idea felt more like you
               when you answered today. A lower score does not
               mean you are bad at something.
-              ${
-                formatPercent(
-                  maximumPossibleScore
-                )
-              }
+              ${formatPercent(
+                maximumPossibleScore
+              )}
               is the highest possible score in this system.
             </p>
 
@@ -4435,7 +4043,6 @@
       );
   }
 
-
   /* ==========================================================
      RESET
   ========================================================== */
@@ -4461,7 +4068,6 @@
 
     renderWelcome();
   }
-
 
   /* ==========================================================
      START
