@@ -25,13 +25,14 @@
     reportMinTopSignals: 3,
     reportMaxTopSignals: 5,
 
-    maxLowMicrosInLearnBest: 1,
-
     integrativeEvenRangeMax: 0.18,
     integrativePeakGapMin: 0.14,
     integrativeStrongPeakMin: 0.78,
 
-    meaningfulReflectionMinWords: 2
+    meaningfulReflectionMinWords: 2,
+
+    learnBestMaxWords: 95,
+    integrativeMaxWords: 95
   };
 
   const FAMILY_ORDER = [
@@ -40,6 +41,34 @@
     "Helping",
     "Organization"
   ];
+
+  const FAMILY_DESCRIPTORS = {
+    Thinking:
+      "wondering, making connections, imagining possibilities, and reflecting on ideas",
+
+    Action:
+      "getting started, sticking with challenges, experimenting, and learning by doing",
+
+    Helping:
+      "explaining, supporting, collaborating, and working with other people",
+
+    Organization:
+      "planning, creating structure, and knowing what comes next"
+  };
+
+  const FAMILY_LEARNING_TEXT = {
+    Thinking:
+      "You may learn especially well when there is time to wonder, make connections, explore possibilities, and think ideas through before moving on.",
+
+    Action:
+      "You may learn especially well when you can take a first step, try something for yourself, and improve it as you go.",
+
+    Helping:
+      "You may learn especially well when you can talk ideas through, support someone else, or work toward a goal with other people.",
+
+    Organization:
+      "You may learn especially well when expectations are clear, there is a plan to follow, and you know what comes next."
+  };
 
   const RADAR_ORDER = [
     "Curiosity",
@@ -184,39 +213,29 @@
     }
   ];
 
-  const QUESTION_BY_ID =
-    new Map(
-      data.questions.map(
-        (question) => [
-          question.id,
-          question
-        ]
-      )
-    );
+  const QUESTION_BY_ID = new Map(
+    data.questions.map(
+      (question) => [
+        question.id,
+        question
+      ]
+    )
+  );
 
-  const SIGNAL_FAMILY =
-    new Map(
-      data.signals.map(
-        (signal) => [
-          signal.name,
-          signal.family
-        ]
-      )
-    );
+  const SIGNAL_FAMILY = new Map(
+    data.signals.map(
+      (signal) => [
+        signal.name,
+        signal.family
+      ]
+    )
+  );
 
   const state = {
     name: "",
-
     currentQuestionIndex: 0,
-
-    /*
-     * Stores question IDs in the randomized
-     * order for this one profile.
-     */
     questionOrder: [],
-
     answers: {},
-
     reflectionEnjoy: "",
     reflectionSurprise: ""
   };
@@ -238,41 +257,21 @@
     return String(
       value ?? ""
     )
-      .replaceAll(
-        "&",
-        "&amp;"
-      )
-      .replaceAll(
-        "<",
-        "&lt;"
-      )
-      .replaceAll(
-        ">",
-        "&gt;"
-      )
-      .replaceAll(
-        '"',
-        "&quot;"
-      )
-      .replaceAll(
-        "'",
-        "&#039;"
-      );
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
 
-  function toSignalSlug(
-    signalName
-  ) {
+  function toSignalSlug(signalName) {
     return String(
       signalName || ""
     )
       .trim()
       .toLowerCase()
-      .replaceAll(
-        "&",
-        "and"
-      )
+      .replaceAll("&", "and")
       .replace(
         /[^a-z0-9]+/g,
         "_"
@@ -284,9 +283,7 @@
   }
 
 
-  function ensureSentence(
-    value
-  ) {
+  function ensureSentence(value) {
     const text =
       String(
         value || ""
@@ -296,17 +293,119 @@
       return "";
     }
 
-    return /[.!?]$/.test(
-      text
-    )
+    return /[.!?]$/.test(text)
       ? text
       : `${text}.`;
   }
 
 
-  function hashString(
-    value
+  function countWords(value) {
+    const text =
+      String(
+        value || ""
+      ).trim();
+
+    if (!text) {
+      return 0;
+    }
+
+    return text
+      .split(/\s+/)
+      .filter(Boolean)
+      .length;
+  }
+
+
+  function truncateToWords(
+    value,
+    maxWords
   ) {
+    const text =
+      String(
+        value || ""
+      ).trim();
+
+    const words =
+      text
+        .split(/\s+/)
+        .filter(Boolean);
+
+    if (
+      words.length <= maxWords
+    ) {
+      return text;
+    }
+
+    return (
+      words
+        .slice(
+          0,
+          maxWords
+        )
+        .join(" ")
+        .replace(
+          /[,;:–—-]+$/,
+          ""
+        ) +
+      "…"
+    );
+  }
+
+
+  function composeNarrative(
+    parts,
+    maxWords
+  ) {
+    const cleaned =
+      parts
+        .map(
+          (part) =>
+            ensureSentence(part)
+        )
+        .filter(Boolean);
+
+    if (
+      cleaned.length === 0
+    ) {
+      return "";
+    }
+
+    const result = [];
+    let usedWords = 0;
+
+    for (
+      const part
+      of cleaned
+    ) {
+      const words =
+        countWords(part);
+
+      if (
+        result.length === 0 &&
+        words > maxWords
+      ) {
+        return truncateToWords(
+          part,
+          maxWords
+        );
+      }
+
+      if (
+        usedWords + words >
+        maxWords
+      ) {
+        continue;
+      }
+
+      result.push(part);
+      usedWords += words;
+    }
+
+    return result.join(" ");
+  }
+
+
+  function hashString(value) {
     const text =
       String(
         value || ""
@@ -415,9 +514,7 @@
   }
 
 
-  function randomChoice(
-    items
-  ) {
+  function randomChoice(items) {
     if (
       !items ||
       items.length === 0
@@ -435,9 +532,7 @@
   }
 
 
-  function shuffledCopy(
-    items
-  ) {
+  function shuffledCopy(items) {
     const result =
       [...items];
 
@@ -467,28 +562,9 @@
 
 
   /*
-   * BALANCED SHUFFLE
-   *
-   * There are 10 signals with five questions each.
-   *
-   * We shuffle the five questions inside each
-   * signal, then build five randomized rounds.
-   *
-   * Each round contains one question from each
-   * signal. This means approximately every block
-   * of 10 questions contains the full range of
-   * Explorer Signals.
-   *
-   * Within each round we also:
-   * - avoid repeating the same signal at a boundary
-   * - avoid three questions from the same family
-   *   in a row
-   * - prefer families that have appeared less often
-   *   in the last several questions
-   *
-   * The result still feels random, but is less likely
-   * to produce strange clusters that could affect
-   * the questionnaire experience.
+   * Balanced randomization:
+   * each round contains one question
+   * from each of the 10 Explorer Signals.
    */
   function buildBalancedQuestionOrder() {
     const bySignal =
@@ -633,10 +709,6 @@
             }
           );
 
-        /*
-         * Relax only the family-run rule
-         * if necessary.
-         */
         if (
           candidates.length === 0
         ) {
@@ -648,9 +720,6 @@
             );
         }
 
-        /*
-         * Extremely defensive fallback.
-         */
         if (
           candidates.length === 0
         ) {
@@ -658,10 +727,6 @@
             [...remainingSignals];
         }
 
-        /*
-         * Among valid choices, favor a family
-         * that has appeared less often recently.
-         */
         const recentQuestions =
           orderedQuestions.slice(
             -5
@@ -908,14 +973,8 @@
       .addEventListener(
         "click",
         () => {
-          /*
-           * Randomize once at the beginning
-           * of this profile.
-           */
           ensureQuestionOrder();
-
           renderNameScreen();
-
           scrollToCard();
         }
       );
@@ -984,7 +1043,6 @@
       </div>
     `;
 
-
     document
       .getElementById(
         "name-back"
@@ -992,16 +1050,10 @@
       .addEventListener(
         "click",
         () => {
-          /*
-           * Returning to the welcome screen does NOT
-           * reshuffle the current profile.
-           */
           renderWelcome();
-
           scrollToCard();
         }
       );
-
 
     document
       .getElementById(
@@ -1022,7 +1074,6 @@
             0;
 
           renderQuestion();
-
           scrollToCard();
         }
       );
@@ -1111,12 +1162,6 @@
         100
       );
 
-    /*
-     * Notice that the old questionnaire
-     * theme/section banner is deliberately
-     * gone. The child sees the question,
-     * not the scoring architecture.
-     */
     appCard.innerHTML = `
 
       <div class="progress-label">
@@ -1208,7 +1253,6 @@
       </button>
     `;
 
-
     document
       .querySelectorAll(
         'input[name="answer"]'
@@ -1259,7 +1303,6 @@
         }
       );
 
-
     document
       .getElementById(
         "question-back"
@@ -1268,11 +1311,9 @@
         "click",
         () => {
           goBackFromQuestion();
-
           scrollToCard();
         }
       );
-
 
     document
       .getElementById(
@@ -1293,11 +1334,9 @@
           }
 
           goForwardFromQuestion();
-
           scrollToCard();
         }
       );
-
 
     document
       .getElementById(
@@ -1311,7 +1350,6 @@
           ];
 
           goForwardFromQuestion();
-
           scrollToCard();
         }
       );
@@ -1324,7 +1362,6 @@
       0
     ) {
       renderNameScreen();
-
       return;
     }
 
@@ -1345,7 +1382,6 @@
         1;
 
       renderQuestion();
-
       return;
     }
 
@@ -1486,7 +1522,6 @@
       </div>
     `;
 
-
     document
       .getElementById(
         "reflection-back"
@@ -1501,11 +1536,9 @@
             1;
 
           renderQuestion();
-
           scrollToCard();
         }
       );
-
 
     document
       .getElementById(
@@ -1515,9 +1548,7 @@
         "click",
         () => {
           saveReflectionValues();
-
           renderResultsScreen();
-
           scrollToCard();
         }
       );
@@ -1555,12 +1586,6 @@
 
     return data.signals.map(
       (signal) => {
-        /*
-         * Scoring references the question's
-         * signal assignment, NOT its displayed
-         * position. Randomizing presentation
-         * therefore does not alter the math.
-         */
         const questions =
           data.questions.filter(
             (question) =>
@@ -1698,6 +1723,125 @@
           100
       )
     );
+  }
+
+
+  /* ==========================================================
+     FAMILY ANALYSIS
+  ========================================================== */
+
+  function getFamilySummaries(
+    scores
+  ) {
+    return FAMILY_ORDER
+      .map(
+        (
+          family,
+          originalIndex
+        ) => {
+          const available =
+            scores.filter(
+              (signal) =>
+                signal.family ===
+                  family &&
+                Number.isFinite(
+                  signal.score
+                )
+            );
+
+          if (
+            available.length ===
+            0
+          ) {
+            return {
+              family,
+              average: null,
+              count: 0,
+              originalIndex
+            };
+          }
+
+          const average =
+            available.reduce(
+              (
+                sum,
+                signal
+              ) =>
+                sum +
+                signal.score,
+              0
+            ) /
+            available.length;
+
+          return {
+            family,
+            average,
+            count:
+              available.length,
+            originalIndex
+          };
+        }
+      )
+      .filter(
+        (summary) =>
+          Number.isFinite(
+            summary.average
+          )
+      )
+      .sort(
+        (a, b) =>
+          b.average -
+            a.average ||
+          a.originalIndex -
+            b.originalIndex
+      );
+  }
+
+
+  function getHighestSignals(
+    scores
+  ) {
+    const available =
+      scores.filter(
+        (signal) =>
+          Number.isFinite(
+            signal.score
+          )
+      );
+
+    if (
+      available.length ===
+      0
+    ) {
+      return [];
+    }
+
+    const maximum =
+      Math.max(
+        ...available.map(
+          (signal) =>
+            signal.score
+        )
+      );
+
+    return data.signals
+      .map(
+        (definition) =>
+          available.find(
+            (signal) =>
+              signal.name ===
+              definition.name
+          )
+      )
+      .filter(Boolean)
+      .filter(
+        (signal) =>
+          Math.abs(
+            signal.score -
+            maximum
+          ) <
+          1e-12
+      );
   }
 
 
@@ -1874,19 +2018,42 @@
     scores,
     allTied
   }) {
-    if (
-      allTied ||
-      standoutSignals.length ===
-        0
-    ) {
-      return (
-        narratives
-          .cluster_fallback ||
-        ""
+    const familySummaries =
+      getFamilySummaries(
+        scores
       );
-    }
+
+    const strongestFamily =
+      familySummaries[0];
 
     const parts = [];
+
+    if (allTied) {
+      parts.push(
+        narratives
+          .cluster_fallback ||
+        "You seem comfortable learning in several different ways, depending on the activity and situation."
+      );
+
+      if (
+        strongestFamily &&
+        FAMILY_LEARNING_TEXT[
+          strongestFamily.family
+        ]
+      ) {
+        parts.push(
+          FAMILY_LEARNING_TEXT[
+            strongestFamily.family
+          ]
+        );
+      }
+
+      return composeNarrative(
+        parts,
+        PROFILE_RULES
+          .learnBestMaxWords
+      );
+    }
 
     const cluster =
       chooseBestCluster(
@@ -1896,71 +2063,68 @@
 
     if (cluster) {
       parts.push(
-        ensureSentence(
-          narratives[
-            cluster.key
-          ]
-        )
+        narratives[
+          cluster.key
+        ]
       );
     }
 
-    let microSignals =
-      standoutSignals;
+    const clusterSignals =
+      new Set(
+        cluster
+          ? cluster.signals
+          : []
+      );
 
-    if (cluster) {
-      const outsideCluster =
-        standoutSignals.filter(
-          (signalName) =>
-            !cluster.signals
-              .includes(
-                signalName
-              )
+    const highCandidates =
+      standoutSignals.filter(
+        (signalName) =>
+          !clusterSignals.has(
+            signalName
+          )
+      );
+
+    const firstHighSignal =
+      highCandidates[0] ||
+      standoutSignals[0];
+
+    if (firstHighSignal) {
+      const slug =
+        toSignalSlug(
+          firstHighSignal
         );
 
-      microSignals =
-        outsideCluster.length >
-        0
-          ? outsideCluster
-          : cluster.signals.slice(
-              0,
-              1
-            );
+      const highText =
+        pickNarrativeVariant(
+          `micro_${slug}_high`,
+          "learn-best"
+        );
+
+      if (highText) {
+        parts.push(
+          highText
+        );
+      }
     }
 
-    const highMicroCount =
-      cluster
-        ? 1
-        : 2;
-
-    microSignals
-      .slice(
-        0,
-        highMicroCount
-      )
-      .forEach(
-        (signalName) => {
-          const slug =
-            toSignalSlug(
-              signalName
-            );
-
-          const text =
-            pickNarrativeVariant(
-              `micro_${slug}_high`,
-              "learn-best"
-            );
-
-          if (text) {
-            parts.push(
-              ensureSentence(
-                text
-              )
-            );
-          }
-        }
+    if (
+      strongestFamily &&
+      FAMILY_LEARNING_TEXT[
+        strongestFamily.family
+      ]
+    ) {
+      parts.push(
+        FAMILY_LEARNING_TEXT[
+          strongestFamily.family
+        ]
       );
+    }
 
-    const lowSignal =
+    /*
+     * A lower signal can add useful context
+     * without being framed as a weakness.
+     */
+    const bottomSignal =
       bottomSignals.find(
         (signalName) =>
           !standoutSignals
@@ -1970,14 +2134,15 @@
       );
 
     if (
-      lowSignal &&
-      PROFILE_RULES
-        .maxLowMicrosInLearnBest >
-        0
+      bottomSignal &&
+      countWords(
+        parts.join(" ")
+      ) <
+      72
     ) {
       const slug =
         toSignalSlug(
-          lowSignal
+          bottomSignal
         );
 
       const lowText =
@@ -1988,15 +2153,177 @@
 
       if (lowText) {
         parts.push(
-          ensureSentence(
-            lowText
-          )
+          lowText
         );
       }
     }
 
-    return parts.join(
-      " "
+    /*
+     * If there was no cluster, a second
+     * standout signal adds more depth.
+     */
+    if (
+      !cluster &&
+      countWords(
+        parts.join(" ")
+      ) <
+      65
+    ) {
+      const secondSignal =
+        standoutSignals.find(
+          (signalName) =>
+            signalName !==
+            firstHighSignal
+        );
+
+      if (secondSignal) {
+        const slug =
+          toSignalSlug(
+            secondSignal
+          );
+
+        const text =
+          pickNarrativeVariant(
+            `micro_${slug}_high`,
+            "learn-best-second"
+          );
+
+        if (text) {
+          parts.push(
+            text
+          );
+        }
+      }
+    }
+
+    return composeNarrative(
+      parts,
+      PROFILE_RULES
+        .learnBestMaxWords
+    );
+  }
+
+
+  function buildFamilyAwareIntegrativeSummary({
+    scores,
+    allTied
+  }) {
+    const familySummaries =
+      getFamilySummaries(
+        scores
+      );
+
+    if (
+      familySummaries.length <
+      2
+    ) {
+      return buildLegacyIntegrativeSummary(
+        scores
+      );
+    }
+
+    const strongestFamily =
+      familySummaries[0];
+
+    const secondFamily =
+      familySummaries[1];
+
+    const weakestFamily =
+      familySummaries[
+        familySummaries.length -
+        1
+      ];
+
+    const familySpread =
+      strongestFamily.average -
+      weakestFamily.average;
+
+    const strongestSignals =
+      getHighestSignals(
+        scores
+      );
+
+    const parts = [];
+
+    if (
+      allTied ||
+      familySpread <= 0.055
+    ) {
+      parts.push(
+        "Your four Explorer families are fairly close together right now. That suggests flexibility: you may be comfortable shifting between thinking, taking action, helping others, and using structure depending on what the situation calls for."
+      );
+    } else {
+      parts.push(
+        `Your ${strongestFamily.family} signals are strongest overall, with ${secondFamily.family} providing the next strongest pattern. That combination suggests you may especially enjoy situations where ${FAMILY_DESCRIPTORS[strongestFamily.family]} can work alongside ${FAMILY_DESCRIPTORS[secondFamily.family]}.`
+      );
+    }
+
+    if (
+      !allTied &&
+      strongestSignals.length > 0
+    ) {
+      if (
+        strongestSignals.length === 1
+      ) {
+        parts.push(
+          `${strongestSignals[0].name} stands out most strongly among your individual signals, giving another clue about what feels especially natural or energizing to you right now.`
+        );
+      } else {
+        const names =
+          strongestSignals
+            .slice(0, 3)
+            .map(
+              (signal) =>
+                signal.name
+            );
+
+        parts.push(
+          `${names.join(", ")} are among your strongest individual signals, showing that more than one way of approaching learning and exploration feels natural to you right now.`
+        );
+      }
+    }
+
+    const organization =
+      familySummaries.find(
+        (summary) =>
+          summary.family ===
+          "Organization"
+      );
+
+    if (
+      organization &&
+      familySummaries.length >= 3
+    ) {
+      const distanceFromTop =
+        strongestFamily.average -
+        organization.average;
+
+      if (
+        organization.family ===
+          strongestFamily.family &&
+        strongestFamily.average -
+          secondFamily.average >=
+          0.08
+      ) {
+        parts.push(
+          "Structure and clear next steps appear to play an especially important role in helping you feel ready to focus and move forward."
+        );
+      } else if (
+        organization.family ===
+          weakestFamily.family &&
+        distanceFromTop >=
+          0.12
+      ) {
+        parts.push(
+          "Organization is less prominent in this snapshot, which may simply mean you prefer enough structure to get started without needing every detail planned in advance."
+        );
+      }
+    }
+
+    return composeNarrative(
+      parts,
+      PROFILE_RULES
+        .integrativeMaxWords
     );
   }
 
@@ -2014,16 +2341,15 @@
       );
 
     if (
-      scored.length === 0
+      scored.length ===
+      0
     ) {
       return "";
     }
 
     if (allTied) {
       return (
-        "Choose one question from this profile that caught your attention, " +
-        "and try a small activity connected to it. Notice what feels fun, " +
-        "interesting, or worth exploring again."
+        "Choose one question from this profile that caught your attention, and try a small activity connected to it. Notice what feels fun, interesting, or worth exploring again."
       );
     }
 
@@ -2035,11 +2361,6 @@
         )
       );
 
-    /*
-     * Uses the established signal order,
-     * not randomized question order,
-     * as the tie-break.
-     */
     const strongest =
       data.signals
         .map(
@@ -2129,7 +2450,7 @@
 
 
   /* ==========================================================
-     INTEGRATIVE SUMMARY
+     LEGACY INTEGRATIVE FALLBACK
   ========================================================== */
 
   function computeIntegrativeKey(
@@ -2212,7 +2533,7 @@
   }
 
 
-  function buildIntegrativeSummary(
+  function buildLegacyIntegrativeSummary(
     scores
   ) {
     const key =
@@ -2511,13 +2832,6 @@
         )
       );
 
-    /*
-     * All AVAILABLE signal scores tying is
-     * treated as a balanced profile.
-     *
-     * A completely skipped signal remains
-     * excluded rather than being treated as 0.
-     */
     const allTied =
       scoredSignals.length >
         1 &&
@@ -2647,9 +2961,10 @@
       });
 
     const integrativeSummary =
-      buildIntegrativeSummary(
-        scores
-      );
+      buildFamilyAwareIntegrativeSummary({
+        scores,
+        allTied
+      });
 
     const nextStep =
       buildNextStep(
@@ -2688,6 +3003,81 @@
       qualitativeText:
         buildQualitativeText()
     };
+  }
+
+
+  /* ==========================================================
+     PRINT DENSITY
+  ========================================================== */
+
+  function getPrintDensityClass(
+    profile
+  ) {
+    const standoutWords =
+      profile.topSignalItems
+        .reduce(
+          (
+            sum,
+            item
+          ) =>
+            sum +
+            countWords(
+              item.text
+            ),
+          0
+        );
+
+    const qualitativeWords =
+      countWords(
+        profile.qualitativeText
+      );
+
+    const totalWords =
+      standoutWords +
+      countWords(
+        profile.learnBest
+      ) +
+      countWords(
+        profile.integrativeSummary
+      ) +
+      countWords(
+        profile.nextStep
+      ) +
+      countWords(
+        profile.fluidityNote
+      ) +
+      qualitativeWords;
+
+    if (
+      totalWords > 390 ||
+      qualitativeWords > 120 ||
+      (
+        profile
+          .standoutSignals
+          .length >= 5 &&
+        totalWords > 330
+      )
+    ) {
+      return (
+        "print-density-tight"
+      );
+    }
+
+    if (
+      totalWords > 300 ||
+      qualitativeWords > 70 ||
+      profile
+        .standoutSignals
+        .length >= 5
+    ) {
+      return (
+        "print-density-medium"
+      );
+    }
+
+    return (
+      "print-density-roomy"
+    );
   }
 
 
@@ -2798,14 +3188,17 @@
   function buildRadarSvg(
     profile
   ) {
-    const width = 470;
-    const height = 405;
+    const width = 540;
+    const height = 470;
 
-    const centerX = 235;
-    const centerY = 175;
+    const centerX = 270;
+    const centerY = 210;
 
-    const radius = 126;
-    const labelRadius = 165;
+    /*
+     * Larger than the earlier version.
+     */
+    const radius = 150;
+    const labelRadius = 190;
 
     const scoreMap =
       new Map(
@@ -2855,6 +3248,7 @@
       };
     }
 
+
     function pointsForSignalNames(
       signalNames
     ) {
@@ -2893,18 +3287,16 @@
             };
           }
         )
-        .filter(
-          Boolean
-        );
+        .filter(Boolean);
     }
+
 
     function pathForPoints(
       points,
       closePath
     ) {
       if (
-        points.length ===
-        0
+        points.length === 0
       ) {
         return "";
       }
@@ -2954,6 +3346,7 @@
       );
     }
 
+
     const organizationScore =
       scoreMap.get(
         "Organization"
@@ -2993,6 +3386,7 @@
       `;
     }
 
+
     const familyClass = {
       Thinking:
         "radar-thinking",
@@ -3003,6 +3397,7 @@
       Helping:
         "radar-helping"
     };
+
 
     const familyPaths =
       Object.entries(
@@ -3034,26 +3429,46 @@
             const circles =
               points
                 .map(
-                  (point) => `
-                    <circle
-                      class="radar-point ${
-                        familyClass[
-                          familyName
-                        ]
-                      }-point"
-                      cx="${
-                        point.x.toFixed(
-                          2
-                        )
-                      }"
-                      cy="${
-                        point.y.toFixed(
-                          2
-                        )
-                      }"
-                      r="5"
-                    />
-                  `
+                  (point) => {
+                    const standout =
+                      standoutSet.has(
+                        point.signalName
+                      );
+
+                    return `
+                      ${
+                        standout
+                          ? `
+                            <circle
+                              class="radar-standout-halo"
+                              cx="${point.x.toFixed(2)}"
+                              cy="${point.y.toFixed(2)}"
+                              r="10"
+                            />
+                          `
+                          : ""
+                      }
+
+                      <circle
+                        class="radar-point ${
+                          familyClass[
+                            familyName
+                          ]
+                        }-point ${
+                          standout
+                            ? "radar-point-top"
+                            : ""
+                        }"
+                        cx="${point.x.toFixed(2)}"
+                        cy="${point.y.toFixed(2)}"
+                        r="${
+                          standout
+                            ? "6.5"
+                            : "5"
+                        }"
+                      />
+                    `;
+                  }
                 )
                 .join("");
 
@@ -3078,6 +3493,7 @@
         )
         .join("");
 
+
     const labels =
       RADAR_ORDER
         .map(
@@ -3099,46 +3515,78 @@
               "middle";
 
             if (
-              deltaX > 35
+              deltaX > 38
             ) {
               anchor =
                 "start";
             }
 
             if (
-              deltaX < -35
+              deltaX < -38
             ) {
               anchor =
                 "end";
             }
 
-            const topClass =
+            const standout =
               standoutSet.has(
                 signalName
-              )
+              );
+
+            const topClass =
+              standout
                 ? " radar-label-top"
                 : "";
 
+            let starX =
+              point.x;
+
+            let starY =
+              point.y;
+
+            if (
+              anchor ===
+              "start"
+            ) {
+              starX -= 12;
+            } else if (
+              anchor ===
+              "end"
+            ) {
+              starX += 12;
+            } else {
+              starY -= 16;
+            }
+
             return `
+              ${
+                standout
+                  ? `
+                    <text
+                      class="radar-standout-star"
+                      x="${starX.toFixed(2)}"
+                      y="${starY.toFixed(2)}"
+                      text-anchor="middle"
+                      dominant-baseline="middle"
+                    >★</text>
+                  `
+                  : ""
+              }
+
               <text
                 class="radar-label${topClass}"
-                x="${
-                  point.x.toFixed(2)
-                }"
-                y="${
-                  point.y.toFixed(2)
-                }"
+                x="${point.x.toFixed(2)}"
+                y="${point.y.toFixed(2)}"
                 text-anchor="${anchor}"
                 dominant-baseline="middle"
-              >${
-                escapeHtml(
-                  signalName
-                )
-              }</text>
+              >${escapeHtml(
+                signalName
+              )}</text>
             `;
           }
         )
         .join("");
+
 
     const organizationLegendClass =
       standoutSet.has(
@@ -3146,6 +3594,7 @@
       )
         ? " legend-label-top"
         : "";
+
 
     return `
       <svg
@@ -3162,6 +3611,7 @@
         <desc id="radar-desc">
           A nine-spoke radar map showing Thinking,
           Action, Helping, and Organization signal patterns.
+          Gold stars mark standout Explorer Signals.
         </desc>
 
         ${organizationPath}
@@ -3173,7 +3623,7 @@
 
         <g
           class="radar-legend"
-          transform="translate(62 372)"
+          transform="translate(65 446)"
         >
 
           <circle
@@ -3193,13 +3643,13 @@
 
           <circle
             class="legend-dot legend-action"
-            cx="95"
+            cx="112"
             cy="0"
             r="5"
           ></circle>
 
           <text
-            x="107"
+            x="124"
             y="1"
           >
             Action
@@ -3208,13 +3658,13 @@
 
           <circle
             class="legend-dot legend-helping"
-            cx="169"
+            cx="198"
             cy="0"
             r="5"
           ></circle>
 
           <text
-            x="181"
+            x="210"
             y="1"
           >
             Helping
@@ -3223,15 +3673,15 @@
 
           <line
             class="legend-org-line"
-            x1="262"
+            x1="306"
             y1="0"
-            x2="277"
+            x2="323"
             y2="0"
           ></line>
 
           <text
             class="${organizationLegendClass}"
-            x="285"
+            x="332"
             y="1"
           >
             Organization
@@ -3547,7 +3997,6 @@
               1;
 
             renderQuestion();
-
             scrollToCard();
           }
         );
@@ -3560,7 +4009,6 @@
           "click",
           () => {
             resetApp();
-
             scrollToCard();
           }
         );
@@ -3584,6 +4032,19 @@
             Some areas are based on fewer answers.
             Signals with no answers are left out of
             the map and rankings.
+          </p>
+        `
+        : "";
+
+    const standoutMapNote =
+      profile
+        .standoutSignals
+        .length >
+      0
+        ? `
+          <p class="radar-standout-note">
+            <span aria-hidden="true">★</span>
+            Standout signal
           </p>
         `
         : "";
@@ -3614,15 +4075,26 @@
                 .map(
                   (item) => `
                     <li>
-                      <strong>
-                        ${escapeHtml(
-                          item.label
-                        )}:
-                      </strong>
 
-                      ${escapeHtml(
-                        item.text
-                      )}
+                      <span
+                        class="standout-marker"
+                        aria-hidden="true"
+                      >
+                        ★
+                      </span>
+
+                      <span>
+                        <strong>
+                          ${escapeHtml(
+                            item.label
+                          )}:
+                        </strong>
+
+                        ${escapeHtml(
+                          item.text
+                        )}
+                      </span>
+
                     </li>
                   `
                 )
@@ -3686,9 +4158,16 @@
     const methodologyMarkup =
       buildMethodologyMarkup();
 
+    const densityClass =
+      getPrintDensityClass(
+        profile
+      );
+
     appCard.innerHTML = `
 
-      <article class="profile-results">
+      <article
+        class="profile-results ${densityClass}"
+      >
 
 
         <header class="profile-results-header">
@@ -3744,6 +4223,8 @@
                 profile
               )}
             </div>
+
+            ${standoutMapNote}
 
             ${radarNote}
 
@@ -3844,6 +4325,7 @@
 
 
           <p class="small-text score-explainer">
+
             You answered
             ${answeredCount}
             of
@@ -3854,6 +4336,7 @@
             fills the bar completely. A signal with no answered
             questions is shown as unanswered and is not included
             in rankings or the Explorer Map.
+
           </p>
 
 
@@ -3918,7 +4401,6 @@
       </article>
     `;
 
-
     document
       .getElementById(
         "results-back"
@@ -3927,11 +4409,9 @@
         "click",
         () => {
           renderReflectionScreen();
-
           scrollToCard();
         }
       );
-
 
     document
       .getElementById(
@@ -3942,7 +4422,6 @@
         printProfile
       );
 
-
     document
       .getElementById(
         "start-over"
@@ -3951,7 +4430,6 @@
         "click",
         () => {
           resetApp();
-
           scrollToCard();
         }
       );
@@ -3969,10 +4447,6 @@
     state.currentQuestionIndex =
       0;
 
-    /*
-     * Clearing this is what causes a brand-new
-     * randomized order the next time Start is clicked.
-     */
     state.questionOrder =
       [];
 
