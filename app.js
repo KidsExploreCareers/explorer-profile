@@ -477,6 +477,69 @@
   }
 
 
+  /*
+   * Formats signal-name lists naturally:
+   *
+   * ["Creativity"]
+   * -> "Creativity"
+   *
+   * ["Creativity", "Organization"]
+   * -> "Creativity and Organization"
+   *
+   * ["Curiosity", "Persistence", "Collaboration"]
+   * -> "Curiosity, Persistence, and Collaboration"
+   */
+  function formatNaturalList(
+    values
+  ) {
+    const items =
+      values
+        .map(
+          (value) =>
+            String(
+              value || ""
+            ).trim()
+        )
+        .filter(Boolean);
+
+    if (
+      items.length ===
+      0
+    ) {
+      return "";
+    }
+
+    if (
+      items.length ===
+      1
+    ) {
+      return items[0];
+    }
+
+    if (
+      items.length ===
+      2
+    ) {
+      return (
+        `${items[0]} and ${items[1]}`
+      );
+    }
+
+    return (
+      `${items
+        .slice(
+          0,
+          -1
+        )
+        .join(", ")}, and ${
+        items[
+          items.length - 1
+        ]
+      }`
+    );
+  }
+
+
   function hashString(
     value
   ) {
@@ -2264,13 +2327,6 @@
           : []
       );
 
-    /*
-     * Add standout-signal observations.
-     *
-     * We intentionally stay strength-based here.
-     * A merely "lowest" score is not automatically
-     * interpreted as a learning limitation.
-     */
     standoutSignals
       .filter(
         (signalName) =>
@@ -2302,11 +2358,6 @@
         }
       );
 
-    /*
-     * If every standout signal was already represented
-     * by a cluster, add one of them back as a short
-     * individualized observation when space allows.
-     */
     if (
       cluster &&
       standoutSignals.every(
@@ -2425,8 +2476,13 @@
                 signal.name
             );
 
+        const formattedNames =
+          formatNaturalList(
+            names
+          );
+
         parts.push(
-          `${names.join(", ")} are among your strongest individual signals, showing that more than one way of approaching learning and exploration feels natural to you right now.`
+          `${formattedNames} are among your strongest individual signals, showing that more than one way of approaching learning and exploration feels natural to you right now.`
         );
       }
     }
@@ -2811,6 +2867,14 @@
         "nope",
         "nah",
         "not really",
+
+        /*
+         * Fix: Mason's answer
+         * "No, not really."
+         * normalizes to this phrase.
+         */
+        "no not really",
+
         "not sure",
         "dont know",
         "do not know",
